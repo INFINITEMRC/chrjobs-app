@@ -1,0 +1,27 @@
+name: Generate APK from PWA
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4 # تحديث لـ v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4 # تحديث لـ v4
+        with:
+          node-version: '20'
+
+      - name: Build APK with Bubblewrap
+        run: |
+          npm install -g @bubblewrap/cli
+          # هاد الأمر كياخد المانيفست ديالك ويحولها لـ APK
+          yes | bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json
+          yes | bubblewrap build
+          
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4 # هذا هو اللي كان مسبب المشكل (تحدث لـ v4)
+        with:
+          name: app-release-apk
+          path: ./*.apk
