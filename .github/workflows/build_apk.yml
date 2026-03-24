@@ -1,27 +1,21 @@
-name: Fast APK Generator
+name: Build APK Fast
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/bubblewrap/bubblewrap:latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Build APK (Auto-Answers)
+      - name: Generate APK
         run: |
-          npm install -g @bubblewrap/cli
-          # هاد الأمر كينشأ الإعدادات أولا بلا ما يسولك
-          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./ --metaData.noStatusUpdate
-          
-          # هاد السطر السحري كيجاوب "Yes" على كاع الأسئلة (JDK, Android SDK, etc.)
-          printf "y\ny\ny\ny\ny\ny\n" | bubblewrap build --skipPasswordPrompt
-          
+          # هاد الكود كيستعمل حاوية جاهزة فيها كلشي
+          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./
+          bubblewrap build --skipPasswordPrompt
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
