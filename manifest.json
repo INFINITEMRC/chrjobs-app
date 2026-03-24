@@ -1,0 +1,24 @@
+{
+  "name": "CHR Jobs Pro",
+  "short_name": "CHR Jobs",
+  "description": "منصة توظيف في المغرب للضيافة والمطاعم",
+  "start_url": "https://chrsd-ca487.web.app/",
+  "display": "standalone",
+  "background_color": "#fdfaf7",
+  "theme_color": "#4e342e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://chrsd-ca487.web.app/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://chrsd-ca487.web.app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,2594 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <link rel="manifest" href="https://chrsd-ca487.web.app/manifest.json">
+    <meta name="theme-color" content="#4e342e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>CHR Jobs Pro - المغرب</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        :root { 
+            --bg: #fdfaf7; 
+            --dark: #4e342e; 
+            --accent: #8d6e63; 
+            --gold: #f1c40f; 
+            --success: #2d6a4f;
+            --danger: #e74c3c;
+            --info: #3498db;
+            --whatsapp: #25D366;
+            --female: #e83e8c;
+            --male: #3498db;
+            --online: #2ecc71;
+            --offline: #95a5a6;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+            --shadow-md: 0 5px 15px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --border-radius: 16px;
+        }
+        
+        /* Dark Mode */
+        .dark-mode {
+            --bg: #1a1a1a;
+            --dark: #e0e0e0;
+            --accent: #b0a8a0;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 5px 15px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        
+        .dark-mode body {
+            background: #1a1a1a;
+        }
+        
+        .dark-mode .worker-card,
+        .dark-mode .filters-container,
+        .dark-mode .navbar,
+        .dark-mode .bottom-nav,
+        .dark-mode .chat-list-item,
+        .dark-mode .modal-content,
+        .dark-mode .auth-container {
+            background: #2d2d2d;
+            color: #e0e0e0;
+        }
+        
+        .dark-mode input,
+        .dark-mode select {
+            background: #3d3d3d;
+            color: #e0e0e0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body { 
+            background: var(--bg); 
+            margin: 0; 
+            font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif; 
+            color: var(--dark); 
+            transition: 0.3s; 
+            padding-bottom: 80px; 
+            direction: rtl;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+        
+        input, select, textarea, button { 
+            font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+        }
+        
+        input, select { 
+            width: 100%; 
+            padding: 14px 18px; 
+            margin: 8px 0; 
+            border: none; 
+            border-radius: var(--border-radius); 
+            background: #fff; 
+            box-shadow: inset 2px 2px 5px #e0dcd8, inset -2px -2px 5px #ffffff; 
+            outline: none; 
+            box-sizing: border-box; 
+            color: var(--dark); 
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234e342e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: left 15px center;
+            background-size: 16px;
+            padding-left: 40px;
+        }
+
+        .page { display: none; min-height: 100vh; animation: fadeIn 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn { 
+            width: 100%; 
+            padding: 15px; 
+            border: none; 
+            border-radius: var(--border-radius); 
+            font-weight: 700; 
+            font-size: 16px;
+            cursor: pointer; 
+            margin-top: 10px; 
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-main { 
+            background: var(--dark); 
+            color: white; 
+            box-shadow: 0 8px 20px rgba(78, 52, 46, 0.3);
+        }
+        
+        .btn-main:hover, .btn-main:active {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(78, 52, 46, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--dark);
+            color: var(--dark);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+        
+        .auth-container {
+            background: var(--bg); 
+            padding: 40px 25px; 
+            border-radius: 40px; 
+            box-shadow: 20px 20px 40px #e0dcd8, -10px -10px 20px #ffffff; 
+            width: 100%; 
+            max-width: 400px; 
+            text-align: center; 
+            position: relative;
+            margin: 15px;
+        }
+
+        .lang-badge { 
+            position: absolute; 
+            top: 20px; 
+            left: 25px; 
+            right: auto;
+            z-index: 10; 
+        }
+        
+        .lang-badge select { 
+            width: 80px; 
+            height: 38px; 
+            padding: 0 10px; 
+            margin: 0; 
+            font-size: 14px; 
+            font-weight: 600;
+            box-shadow: 4px 4px 8px #e0dcd8, -2px -2px 5px #ffffff; 
+            border: 1px solid #ddd; 
+            border-radius: 20px;
+            background-color: white;
+        }
+
+        .logo-box { 
+            width: 100px; 
+            height: 100px; 
+            background: var(--bg); 
+            border-radius: 30px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 5px auto 20px; 
+            box-shadow: 8px 8px 15px #e0dcd8, -8px -8px 15px #ffffff; 
+        }
+
+        .navbar { 
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: var(--shadow-sm); 
+            position: sticky; 
+            top:0; 
+            z-index: 1000; 
+        }
+        
+        .dark-mode .navbar {
+            background: rgba(45,45,45,0.95);
+        }
+        
+        .navbar-brand {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--dark);
+        }
+        
+        .navbar-brand span {
+            color: var(--gold);
+        }
+        
+        #map { 
+            height: 250px; 
+            width: calc(100% - 30px); 
+            margin: 10px auto 20px; 
+            border-radius: 25px; 
+            box-shadow: var(--shadow-lg); 
+            border: 3px solid white; 
+            z-index: 1; 
+        }
+        
+        .filters-container { 
+            display: flex; 
+            gap: 10px; 
+            padding: 15px 20px; 
+            background: white; 
+            margin: 10px 15px 15px; 
+            border-radius: 20px; 
+            box-shadow: var(--shadow-md); 
+            border: 1px solid rgba(255,255,255,0.8);
+            flex-wrap: wrap;
+        }
+        
+        .filters-container select { 
+            flex: 1 1 40%;
+            margin: 0; 
+            border-radius: 30px; 
+            border: 1px solid #eee; 
+            padding: 12px 15px; 
+            background: #f9f9f9; 
+            box-shadow: none; 
+            font-weight: 600; 
+            color: var(--dark);
+            font-size: 14px;
+        }
+        
+        #distanceFilter {
+            flex: 1 1 100%;
+            margin-top: 5px;
+        }
+        
+        /* تحسين شريط الإحصائيات */
+        .stats-card {
+            background: white;
+            border-radius: 20px;
+            padding: 15px 20px;
+            margin: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            animation: slideDown 0.4s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            padding: 5px;
+        }
+        
+        .stat-icon-wrapper {
+            width: 45px;
+            height: 45px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            transition: transform 0.2s;
+        }
+        
+        .stat-item:hover .stat-icon-wrapper {
+            transform: scale(1.05);
+        }
+        
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-number {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            font-weight: 500;
+        }
+        
+        .stat-divider {
+            width: 1px;
+            height: 35px;
+            background: linear-gradient(to bottom, transparent, #ddd, transparent);
+            margin: 0 10px;
+        }
+        
+        /* Dark mode للإحصائيات */
+        .dark-mode .stats-card {
+            background: #2d2d2d;
+            border-color: #3d3d3d;
+        }
+        
+        .dark-mode .stat-number {
+            color: #e0e0e0;
+        }
+        
+        .dark-mode .stat-divider {
+            background: linear-gradient(to bottom, transparent, #555, transparent);
+        }
+        
+        /* بطاقة العامل - تصميم جديد */
+        .worker-card { 
+            background: #fff; 
+            border-radius: 25px; 
+            margin: 12px 15px; 
+            box-shadow: var(--shadow-md); 
+            overflow: hidden;
+            transition: all 0.2s ease;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            padding: 16px;
+            gap: 15px;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+        
+        .worker-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* صورة الأفاتار */
+        .worker-avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .worker-avatar { 
+            width: 80px; 
+            height: 80px; 
+            border-radius: 20px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 3px solid white;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            font-size: 40px;
+        }
+        
+        /* حالة الاتصال */
+        .online-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .online-badge.online {
+            background: var(--online);
+        }
+        
+        .online-badge.offline {
+            background: var(--offline);
+        }
+        
+        /* معلومات العامل */
+        .worker-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        /* رأس البطاقة */
+        .worker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .worker-name-section {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .worker-name { 
+            font-weight: 900; 
+            font-size: 18px; 
+            color: var(--dark); 
+            line-height: 1.3;
+        }
+        
+        .gender-icon {
+            font-size: 16px;
+        }
+        
+        .gender-icon.female {
+            color: var(--female);
+        }
+        
+        .gender-icon.male {
+            color: var(--male);
+        }
+        
+        .pro-badge {
+            background: var(--gold);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .rating-badge {
+            background: rgba(241, 196, 15, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        /* تفاصيل المهنة والموقع */
+        .worker-details {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .detail-item i {
+            width: 16px;
+            color: var(--accent);
+            font-size: 12px;
+        }
+        
+        .dark-mode .detail-item {
+            color: #aaa;
+        }
+        
+        /* حالة العامل */
+        .worker-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 2px;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-indicator.online {
+            color: var(--online);
+        }
+        
+        .status-indicator.offline {
+            color: var(--offline);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-indicator.online .status-dot {
+            background: var(--online);
+        }
+        
+        .status-indicator.offline .status-dot {
+            background: var(--offline);
+        }
+        
+        .last-seen {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        /* التقييم السريع */
+        .quick-rating {
+            direction: ltr;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+        
+        .quick-rating span {
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        
+        .quick-rating span:hover {
+            transform: scale(1.2);
+            color: var(--gold) !important;
+        }
+        
+        /* أزرار الإجراءات */
+        .card-actions { 
+            display: flex; 
+            gap: 8px; 
+            margin-top: 5px; 
+            justify-content: flex-end; 
+        }
+        
+        .btn-wa, .btn-hire, .btn-action-small { 
+            border: none; 
+            padding: 10px; 
+            border-radius: 15px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            font-size: 14px; 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            min-width: 45px;
+            height: 45px;
+        }
+        
+        .btn-wa { 
+            background: #25D366; 
+            color: white; 
+            flex: 1;
+        }
+        
+        .btn-hire { 
+            background: var(--success); 
+            color: white; 
+            flex: 1;
+        }
+        
+        .btn-action-small { 
+            background: var(--bg); 
+            color: var(--dark); 
+            border: 1px solid #ddd; 
+            width: 45px;
+            flex: 0 0 auto;
+        }
+        
+        .btn-wa i, .btn-hire i, .btn-action-small i {
+            font-size: 18px;
+        }
+        
+        .btn-wa:hover, .btn-hire:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* تحسينات للشاشات الصغيرة */
+        @media (max-width: 380px) {
+            .worker-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .worker-header {
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+            
+            .worker-details {
+                align-items: center;
+            }
+            
+            .worker-status {
+                justify-content: center;
+            }
+            
+            .card-actions {
+                justify-content: center;
+            }
+            
+            .worker-avatar-wrapper {
+                margin-bottom: 5px;
+            }
+        }
+        
+        .bottom-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            display: flex; 
+            justify-content: space-around; 
+            padding: 12px 10px 25px; 
+            border-radius: 30px 30px 0 0; 
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1); 
+            z-index: 2000; 
+        }
+        
+        .dark-mode .bottom-nav {
+            background: rgba(45,45,45,0.95);
+        }
+        
+        .nav-item { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: #aaa; 
+            cursor: pointer; 
+            font-size: 12px; 
+            gap: 5px; 
+            font-weight: 600; 
+            transition: 0.3s; 
+        }
+        
+        .nav-item.active { 
+            color: var(--dark); 
+            transform: translateY(-3px);
+        }
+        
+        .nav-item .icon { 
+            font-size: 24px; 
+            transition: 0.3s; 
+        }
+        
+        .msg-badge { 
+            position: absolute; 
+            top: -5px; 
+            right: -8px; 
+            background: var(--danger); 
+            color: white; 
+            border-radius: 50%; 
+            padding: 3px 6px; 
+            font-size: 10px; 
+            font-weight: bold; 
+            border: 2px solid white;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        #chatOverlay { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            height: 90vh; 
+            border-radius: 35px 35px 0 0; 
+            display: none; 
+            flex-direction: column; 
+            z-index: 3000; 
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.2); 
+            animation: slideUp 0.3s ease;
+        }
+        
+        .dark-mode #chatOverlay {
+            background: #2d2d2d;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .chat-header { 
+            background: var(--dark); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 35px 35px 0 0; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-actions button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        #chatMsgs { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+            background: #f5f2ef; 
+        }
+        
+        .dark-mode #chatMsgs {
+            background: #1a1a1a;
+        }
+        
+        .msg { 
+            padding: 12px 18px; 
+            border-radius: 20px; 
+            max-width: 80%; 
+            font-size: 14px; 
+            line-height: 1.5;
+            word-break: break-word;
+        }
+        
+        .sent { 
+            background: var(--dark); 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-left-radius: 5px; 
+        }
+        
+        .recv { 
+            background: white; 
+            align-self: flex-start; 
+            border-bottom-right-radius: 5px; 
+            color: var(--dark);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .dark-mode .recv {
+            background: #3d3d3d;
+            color: #e0e0e0;
+        }
+        
+        .msg-location {
+            color: var(--info);
+            text-decoration: underline;
+        }
+
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(5px);
+            z-index: 4000; 
+            align-items: center; 
+            justify-content: center; 
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .modal-content { 
+            background: var(--bg); 
+            padding: 30px 25px; 
+            border-radius: 35px; 
+            width: 90%; 
+            max-width: 380px; 
+            text-align: center; 
+            box-shadow: var(--shadow-lg);
+            animation: scaleIn 0.3s ease;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .chat-list-item { 
+            background: #fff; 
+            padding: 18px; 
+            border-radius: 20px; 
+            box-shadow: var(--shadow-sm); 
+            margin: 10px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        
+        .chat-list-item:hover, .chat-list-item:active {
+            background: #f9f9f9;
+            transform: translateX(-5px);
+        }
+        
+        .dark-mode .chat-list-item {
+            background: #3d3d3d;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #aaa;
+            font-size: 16px;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+        
+        .toast-message {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            z-index: 5000;
+            animation: slideUp 0.3s ease;
+            font-weight: 600;
+            max-width: 350px;
+            margin: 0 auto;
+        }
+        
+        .badge-new {
+            background: var(--danger);
+            color: white;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 30px;
+            margin-right: 8px;
+        }
+        
+        .section-title {
+            padding: 5px 20px;
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--dark);
+            margin-top: 10px;
+        }
+        
+        .rating-stars {
+            direction: ltr;
+        }
+        
+        .star-input {
+            transition: all 0.2s;
+            font-size: 35px;
+            cursor: pointer;
+            color: #ccc;
+        }
+        
+        .star-input:hover {
+            transform: scale(1.2);
+            color: var(--gold);
+        }
+        
+        /* تحسينات إضافية */
+        .forgot-password {
+            text-align: left;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--accent);
+            cursor: pointer;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Toast للإشعارات -->
+<div id="toast" class="toast-message" style="display: none;"></div>
+
+<!-- مودال التقييم -->
+<div id="rateModal" class="modal">
+    <div class="modal-content">
+        <h3 id="rateTitle" style="margin-bottom: 20px;">تقييم العامل</h3>
+        <div style="margin: 20px 0;" class="rating-stars">
+            <span class="star-input" onclick="setRating(1)">★</span>
+            <span class="star-input" onclick="setRating(2)">★</span>
+            <span class="star-input" onclick="setRating(3)">★</span>
+            <span class="star-input" onclick="setRating(4)">★</span>
+            <span class="star-input" onclick="setRating(5)">★</span>
+        </div>
+        <button class="btn btn-main" onclick="submitRating()" id="btnRateSubmit">حفظ التقييم</button>
+        <p onclick="closeModal('rateModal')" style="margin-top:15px; cursor:pointer; font-size:14px; color: var(--accent);" id="cancelRate">إلغاء</p>
+    </div>
+</div>
+
+<!-- مودال تعديل الملف الشخصي -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <h3 id="editTitle" style="margin-bottom: 20px;">تعديل الملف الشخصي</h3>
+        <input type="text" id="editName" placeholder="الاسم الكامل">
+        <input type="tel" id="editPhone" placeholder="رقم الهاتف">
+        <select id="editGender"></select>
+        <select id="editCity" class="city-list"></select>
+        <select id="editProf" class="prof-list"></select>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn btn-main" onclick="saveProfile()" style="flex:1" id="btnSave">حفظ</button>
+            <button class="btn btn-outline" style="flex:1; background:#f0f0f0;" onclick="closeModal('editModal')" id="btnCancel">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- مودال حظر المستخدم -->
+<div id="blockModal" class="modal">
+    <div class="modal-content">
+        <h3 id="blockTitle" style="margin-bottom: 20px;">حظر المستخدم</h3>
+        <p id="blockMessage">هل أنت متأكد من حظر هذا المستخدم؟</p>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-main" onclick="confirmBlock()" style="flex:1; background:var(--danger);" id="blockConfirm">حظر</button>
+            <button class="btn btn-outline" onclick="closeModal('blockModal')" style="flex:1;" id="blockCancel">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- مودال حفظ الفلاتر -->
+<div id="saveFiltersModal" class="modal">
+    <div class="modal-content">
+        <h3 id="saveFiltersTitle" style="margin-bottom: 20px;">حفظ الفلاتر</h3>
+        <input type="text" id="filterName" placeholder="اسم الفلتر">
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn btn-main" onclick="saveFilters()" id="saveFiltersBtn">حفظ</button>
+            <button class="btn btn-outline" onclick="closeModal('saveFiltersModal')" id="saveFiltersCancel">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- صفحة تسجيل الدخول -->
+<div id="authPage" class="page active">
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px;">
+        <div class="auth-container">
+            <div class="lang-badge">
+                <select id="langAuth" onchange="applyLanguage(this.value)">
+                    <option value="ar" selected>🇲🇦 AR</option>
+                    <option value="fr">🇫🇷 FR</option>
+                    <option value="en">🇬🇧 EN</option>
+                </select>
+            </div>
+            <div class="logo-box" style="width: 150px; height: 150px;">
+                <svg width="110" height="110" viewBox="0 0 100 100">
+                    <path d="M20 70H80C80 70 75 75 50 75C25 75 20 70 20 70Z" fill="var(--dark)"/>
+                    <path d="M25 68C25 40 35 30 50 30C65 30 75 40 75 68" stroke="var(--dark)" stroke-width="8" stroke-linecap="round" fill="none"/>
+                    <circle cx="50" cy="25" r="5" fill="var(--gold)"/>
+                    <path d="M40 45Q50 38 60 45" stroke="var(--gold)" stroke-width="3" stroke-linecap="round" fill="none"/>
+                    <!-- CHR بين الدائرة الذهبية والخط البني -->
+                    <text x="50" y="58" text-anchor="middle" fill="var(--dark)" font-size="14" font-weight="bold" font-family="Tajawal">CHR</text>
+                </svg>
+            </div>
+            <!-- تم إزالة النص CHR JOBS الذي كان تحت اللوغو -->
+            
+            <div id="signupOnly" style="display:none">
+                <input type="text" id="regName" placeholder="الاسم الكامل">
+                <select id="regGender"></select>
+                <select id="regRole" onchange="document.getElementById('workerExtra').style.display=this.value==='worker'?'block':'none'">
+                    <option value="owner" id="optOwner">صاحب عمل</option>
+                    <option value="worker" id="optWorker">باحث عن عمل</option>
+                </select>
+                <div id="workerExtra" style="display:none">
+                    <select id="regCity" class="city-list"></select>
+                    <select id="regProf" class="prof-list"></select>
+                    <input type="tel" id="regPhone" placeholder="06XXXXXXXX" dir="ltr">
+                </div>
+            </div>
+            
+            <input type="email" id="email" dir="ltr" placeholder="البريد الإلكتروني">
+            <input type="password" id="password" dir="ltr" placeholder="كلمة السر">
+            
+            <!-- إضافة زر نسيت كلمة المرور -->
+            <div class="forgot-password" onclick="resetPassword()" id="forgotPassText">نسيت كلمة المرور؟</div>
+            
+            <button class="btn btn-main" onclick="handleAuth()" id="btnSubmit" style="margin-top: 20px;">دخول</button>
+            
+            <p onclick="toggleAuth()" id="toggleTxt" style="cursor:pointer; font-size:14px; margin-top:25px; color: var(--accent); font-weight: 600;"></p>
+        </div>
+    </div>
+</div>
+
+<!-- الصفحة الرئيسية بعد تسجيل الدخول -->
+<div id="dashPage" class="page">
+    <!-- الشريط العلوي -->
+    <div class="navbar">
+        <div style="display:flex; gap:10px;">
+            <select id="langDash" onchange="applyLanguage(this.value)" style="width: 80px; background:white; font-weight:bold; border-radius: 30px; padding: 8px; margin:0; box-shadow: var(--shadow-sm);">
+                <option value="ar">🇲🇦 AR</option>
+                <option value="fr">🇫🇷 FR</option>
+                <option value="en">🇬🇧 EN</option>
+            </select>
+            <button onclick="toggleDarkMode()" style="background:none; border:none; color:var(--dark); font-size:20px; cursor:pointer;" id="darkModeBtn">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+        
+        <div class="navbar-brand">
+            CHR <span>JOBS</span>
+        </div>
+        
+        <button onclick="logout()" id="btnLogout" style="background:var(--danger); color:white; border:none; padding:8px 15px; border-radius:30px; font-weight:bold; font-size: 13px; display: flex; align-items: center; gap:5px;">
+            <i class="fas fa-sign-out-alt"></i> <span id="logoutText">خروج</span>
+        </button>
+    </div>
+
+    <!-- واجهة صاحب العمل -->
+    <div id="ownerView" style="display:none">
+        <!-- التبويب الرئيسي -->
+        <div id="ownerHomeTab">
+            <div style="padding: 15px 20px 5px;">
+                <h2 id="txtFindTitle" style="margin:0; color:var(--dark); font-weight: 900; font-size: 24px;">ابحث عن موظفين في دقائق</h2>
+                <p id="txtFindSub" style="margin:5px 0 0; color:#888; font-size:14px;">وظف باريستا، نادل وطباخ بالقرب منك</p>
+            </div>
+            
+            <!-- الفلاتر المتقدمة - إضافة فلتر الجنس -->
+            <div class="filters-container">
+                <select id="cityFilter" onchange="loadWorkers(); saveFiltersToStorage()"></select>
+                <select id="profFilter" onchange="loadWorkers(); saveFiltersToStorage()"></select>
+                <!-- فلتر الجنس الجديد -->
+                <select id="genderFilter" onchange="loadWorkers(); saveFiltersToStorage()">
+                    <option value="" id="allGenders">جميع الجنسين</option>
+                    <option value="homme" id="maleGender">👨 رجال</option>
+                    <option value="femme" id="femaleGender">👩 نساء</option>
+                </select>
+                <select id="distanceFilter" onchange="loadWorkers(); saveFiltersToStorage()">
+                    <option value="" id="allDistances">كل المسافات</option>
+                    <option value="5" id="dist5">ضمن 5 كم</option>
+                    <option value="10" id="dist10">ضمن 10 كم</option>
+                    <option value="20" id="dist20">ضمن 20 كم</option>
+                    <option value="50" id="dist50">ضمن 50 كم</option>
+                </select>
+                <div style="display:flex; gap:5px; flex:1 1 100%;">
+                    <button class="btn-action-small" onclick="openSaveFiltersModal()" style="flex:1;" id="saveFilterBtn">
+                        <i class="fas fa-save"></i> <span id="saveFilterText">حفظ الفلتر</span>
+                    </button>
+                    <button class="btn-action-small" onclick="loadSavedFilters()" style="flex:1;" id="loadFilterBtn">
+                        <i class="fas fa-folder-open"></i> <span id="loadFilterText">فتح الفلتر</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- إحصائيات -->
+            <div id="statsCard" class="stats-card" style="display: none;">
+                <div class="stat-item">
+                    <div class="stat-icon-wrapper" style="background: rgba(46, 204, 113, 0.15);">
+                        <i class="fas fa-users" style="color: #2ecc71;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-number" id="workersCount">0</span>
+                        <span class="stat-label" id="workersLabel">عمال متاحون</span>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-icon-wrapper" style="background: rgba(241, 196, 15, 0.15);">
+                        <i class="fas fa-star" style="color: #f1c40f;"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-number" id="avgRating">0.0</span>
+                        <span class="stat-label" id="ratingLabel">متوسط التقييم</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- الخريطة -->
+            <div id="map"></div>
+            
+            <!-- عنوان القسم -->
+            <h3 id="txtAvailTitle" class="section-title">الموظفون المتاحون:</h3>
+            
+            <!-- قائمة العمال -->
+            <div id="workersList"></div>
+        </div>
+
+        <!-- تبويب الرسائل -->
+        <div id="ownerMessagesTab" style="display:none;">
+            <h2 id="ownerInboxTitle" class="section-title" style="margin-bottom: 5px;">الرسائل الواردة</h2>
+            <div id="ownerInbox"></div>
+        </div>
+
+        <!-- القائمة السفلية -->
+        <div class="bottom-nav">
+            <div class="nav-item active" id="navHome" onclick="switchTab('home')">
+                <span class="icon"><i class="fas fa-home"></i></span>
+                <span id="txtNavHome">الرئيسية</span>
+            </div>
+            <div class="nav-item" id="navMsg" onclick="switchTab('messages')">
+                <span class="icon" style="position:relative;">
+                    <i class="fas fa-comment-dots"></i>
+                    <span id="msgBadge" class="msg-badge" style="display:none;">0</span>
+                </span>
+                <span id="txtNavMsg">الرسائل</span>
+            </div>
+            <div class="nav-item" onclick="openEdit()">
+                <span class="icon"><i class="fas fa-user"></i></span>
+                <span id="txtNavProf">حسابي</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- واجهة العامل -->
+    <div id="workerView" style="display:none;">
+        <!-- بطاقة الملف الشخصي -->
+        <div style="background: white; padding: 30px 20px; border-radius: 30px; text-align: center; margin: 15px; box-shadow: var(--shadow-lg);">
+            <div id="wIcon" style="font-size: 80px; margin-bottom: 5px;">👤</div>
+            <h2 id="wName" style="font-weight: 900; font-size: 26px; margin: 5px 0;">...</h2>
+            <div id="wRating" style="color:var(--gold); font-weight:bold; font-size: 20px; margin: 5px 0;"></div>
+            <p id="wInfo" style="color: #555; font-size: 16px; margin: 10px 0; background: #f5f5f5; padding: 10px; border-radius: 30px;"></p>
+            
+            <div style="display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;">
+                <button class="btn btn-success" style="flex:1; padding: 14px;" onclick="updateLoc()" id="btnLoc">
+                    <i class="fas fa-map-marker-alt"></i> <span>تحديث الموقع</span>
+                </button>
+                <button class="btn btn-main" style="flex:1; padding: 14px;" onclick="openEdit()" id="btnEdit">
+                    <i class="fas fa-edit"></i> <span>تعديل</span>
+                </button>
+            </div>
+            
+            <!-- زر المشاركة -->
+            <button id="shareProfileBtn" class="btn btn-info" style="margin-top: 10px;" onclick="shareProfile()">
+                <i class="fas fa-share-alt"></i> <span id="shareProfileText">مشاركة الملف الشخصي</span>
+            </button>
+        </div>
+        
+        <h3 id="inboxTitle" class="section-title" style="margin-top: 5px;">الرسائل الواردة</h3>
+        <div id="workerInbox"></div>
+    </div>
+</div>
+
+<!-- نافذة المحادثة -->
+<div id="chatOverlay">
+    <div class="chat-header">
+        <b id="chatTargetName" style="font-size: 18px;">المحادثة</b>
+        <div class="chat-actions">
+            <button onclick="shareLocation()" title="إرسال الموقع" id="sendLocationBtn">
+                <i class="fas fa-map-marker-alt"></i>
+            </button>
+            <button onclick="openBlockModal()" title="حظر" id="blockUserBtn">
+                <i class="fas fa-ban"></i>
+            </button>
+            <button onclick="closeChat()" style="font-size: 28px;">✕</button>
+        </div>
+    </div>
+    
+    <div id="chatMsgs"></div>
+    
+    <div style="padding:15px; display:flex; gap:10px; border-top: 1px solid #eee; background: white;">
+        <input type="text" id="chatInput" placeholder="اكتب رسالة..." style="margin:0; background:#f5f5f5; border-radius: 30px; padding: 15px;">
+        <button onclick="sendMsg()" class="btn" style="width: 60px; margin:0; background:var(--dark); color:white; border-radius: 50%; padding: 0; font-size: 20px;">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    // تهيئة Firebase
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBytAn_s0g4a8_ZSMatjvWGnal6IcjXxdE", 
+        authDomain: "chrsd-ca487.firebaseapp.com", 
+        projectId: "chrsd-ca487", 
+        storageBucket: "chrsd-ca487.firebasestorage.app", 
+        messagingSenderId: "34944672721", 
+        appId: "1:34944672721:web:22772eaf3bc661a2b636f0" 
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // المتغيرات العامة
+    let isLogin = true;
+    let currentUser = null;
+    let map = null;
+    let markers = [];
+    let ownerPos = null;
+    let selectedWorkerId = null;
+    let currentRating = 0;
+    let currentChatId = null;
+    let currentChatTarget = null;
+    let unsubChat = null;
+    let usersCache = {};
+    let toastTimeout = null;
+    let blockTargetId = null;
+
+    // طلب إذن الإشعارات
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+        Notification.requestPermission();
+    }
+
+    // قائمة المدن المغربية
+    const moroccanCities = [
+        "الدار البيضاء", "الرباط", "مراكش", "فاس", "طنجة", "أكادير", "مكناس", "وجدة", "القنيطرة", "تطوان",
+        "آسفي", "المحمدية", "خريبكة", "الجديدة", "بني ملال", "الناظور", "تازة", "سطات", "برشيد", 
+        "الخميسات", "كلميم", "العيون", "الداخلة", "القصر الكبير", "العرائش", "كرسيف", "ورزازات",
+        "تارودانت", "إنزكان", "أيت ملول", "سيدي قاسم", "سيدي سليمان", "تيزنيت", "أزرو", "ميدلت",
+        "اليوسفية", "طانطان", "سيدي بنور", "الصخيرات", "تمارة", "الفنيدق", "مرتيل", "الرشيدية",
+        "تنغير", "شفشاون", "الحسيمة", "أصيلة", "بوجدور", "طرفاية", "إفران", "وزان"
+    ].sort();
+
+    // المهن مع الإيموجيات
+    const jobs = { 
+        waiter: '🧑‍🍳', 
+        chef: '👨‍🍳', 
+        barista: '☕', 
+        barman: '🍸', 
+        pastry: '🍰', 
+        cleaner: '🧹', 
+        security: '🛡️', 
+        delivery: '🛵', 
+        receptionist: '🛎️' 
+    };
+
+    // ترجمة المهن للعربية
+    const jobNamesAr = {
+        waiter: 'نادل',
+        chef: 'طباخ',
+        barista: 'باريستا',
+        barman: 'برمان',
+        pastry: 'حلويات',
+        cleaner: 'عامل نظافة',
+        security: 'حارس أمن',
+        delivery: 'مُوَزِّع',
+        receptionist: 'استقبال'
+    };
+
+    // الترجمات الكاملة
+    const i18n = {
+        ar: { 
+            login: "تسجيل الدخول", 
+            signup: "إنشاء حساب", 
+            btnLogin: "دخول", 
+            btnSignup: "تسجيل", 
+            toggleL: "لديك حساب؟ سجل دخول", 
+            toggleS: "ليس لديك حساب؟ سجل الآن",
+            logout: "خروج", 
+            patron: "صاحب عمل", 
+            worker: "باحث عن عمل", 
+            homme: "ذكر", 
+            femme: "أنثى", 
+            loc: "تحديث الموقع", 
+            edit: "تعديل", 
+            inbox: "الرسائل", 
+            save: "حفظ", 
+            cancel: "إلغاء", 
+            rate: "تقييم", 
+            chat: "دردشة", 
+            km: "كلم", 
+            allC: "جميع المدن", 
+            allP: "جميع المهن", 
+            new: "جديد", 
+            write: "اكتب رسالة...", 
+            waiter: "نادل", 
+            chef: "طباخ", 
+            barista: "باريستا", 
+            barman: "برمان", 
+            pastry: "حلويات", 
+            cleaner: "نظافة", 
+            security: "حارس", 
+            delivery: "موزع", 
+            receptionist: "استقبال", 
+            nameP: "الاسم الكامل", 
+            emailP: "البريد الإلكتروني", 
+            passP: "كلمة السر",
+            findTitle: "ابحث عن مستخدَمين في دقائق", 
+            findSub: "وظف باريستا، نادل وطباخ بالقرب منك", 
+            availTitle: "مستخدَمين المتاحون",
+            availText: "متصل الآن", 
+            offlineText: "غير متصل", 
+            hireBtn: "راسل", 
+            navHome: "الرئيسية", 
+            navMsg: "الرسائل", 
+            navProf: "حسابي",
+            noWorkers: "لا يوجد مستخدَمين متاحون حالياً",
+            noMessages: "لا توجد رسائل جديدة",
+            ratingSubmitted: "تم إرسال تقييمك، شكراً لك!",
+            locationUpdated: "تم تحديث موقعك بنجاح",
+            profileSaved: "تم حفظ الملف الشخصي",
+            profileShared: "تم نسخ الملف الشخصي",
+            locationSent: "تم إرسال الموقع",
+            userBlocked: "تم حظر المستخدم",
+            filtersSaved: "تم حفظ الفلاتر",
+            allDistances: "كل المسافات",
+            dist5: "ضمن 5 كم",
+            dist10: "ضمن 10 كم",
+            dist20: "ضمن 20 كم",
+            dist50: "ضمن 50 كم",
+            saveFilter: "حفظ الفلتر",
+            loadFilter: "فتح الفلتر",
+            shareProfile: "مشاركة الملف الشخصي",
+            blockTitle: "حظر المستخدم",
+            blockMessage: "هل أنت متأكد من حظر هذا المستخدم؟",
+            blockConfirm: "حظر",
+            blockCancel: "إلغاء",
+            saveFiltersTitle: "حفظ الفلاتر",
+            filterNamePlaceholder: "اسم الفلتر",
+            saveFiltersBtn: "حفظ",
+            saveFiltersCancel: "إلغاء",
+            workersCount: "عمال متاحون",
+            avgRating: "متوسط التقييم",
+            lastSeenMinutes: "آخر ظهور منذ",
+            lastSeenHours: "آخر ظهور منذ",
+            lastSeenDays: "آخر ظهور منذ",
+            minutes: "د",
+            hours: "س",
+            days: "ي",
+            sendLocation: "إرسال الموقع",
+            blockUser: "حظر",
+            male: "ذكر",
+            female: "أنثى",
+            allGenders: "جميع الجنسين",
+            forgotPass: "نسيت كلمة المرور؟"
+        },
+        fr: { 
+            login: "Connexion", 
+            signup: "Inscription", 
+            btnLogin: "Connexion", 
+            btnSignup: "S'inscrire", 
+            toggleL: "Déjà inscrit? Connectez-vous", 
+            toggleS: "Créer un compte", 
+            logout: "Quitter", 
+            patron: "Patron", 
+            worker: "Employé", 
+            homme: "Homme", 
+            femme: "Femme", 
+            loc: "Ma Position", 
+            edit: "Modifier", 
+            inbox: "Messages", 
+            save: "Sauvegarder", 
+            cancel: "Annuler", 
+            rate: "Noter", 
+            chat: "Chat", 
+            km: "km", 
+            allC: "Toutes les Villes", 
+            allP: "Tous les Métiers", 
+            new: "Nouveau", 
+            write: "Message...", 
+            waiter: "Serveur", 
+            chef: "Chef", 
+            barista: "Barista", 
+            barman: "Barman", 
+            pastry: "Pâtissier", 
+            cleaner: "Nettoyage", 
+            security: "Sécurité", 
+            delivery: "Livreur", 
+            receptionist: "Réception", 
+            nameP: "Nom Complet", 
+            emailP: "Email", 
+            passP: "Mot de passe",
+            findTitle: "Trouvez du personnel en quelques minutes", 
+            findSub: "Embauchez des Baristas, Serveurs et Chefs près de chez vous", 
+            availTitle: "Personnel disponible:",
+            availText: "En ligne", 
+            offlineText: "Hors ligne", 
+            hireBtn: "Contacter", 
+            navHome: "Accueil", 
+            navMsg: "Messages", 
+            navProf: "Profil",
+            noWorkers: "Aucun employé disponible pour le moment",
+            noMessages: "Aucun message",
+            ratingSubmitted: "Merci pour votre évaluation!",
+            locationUpdated: "Position mise à jour",
+            profileSaved: "Profil enregistré",
+            profileShared: "Profil copié",
+            locationSent: "Localisation envoyée",
+            userBlocked: "Utilisateur bloqué",
+            filtersSaved: "Filtres sauvegardés",
+            allDistances: "Toutes les distances",
+            dist5: "Moins de 5 km",
+            dist10: "Moins de 10 km",
+            dist20: "Moins de 20 km",
+            dist50: "Moins de 50 km",
+            saveFilter: "Sauvegarder filtre",
+            loadFilter: "Charger filtre",
+            shareProfile: "Partager profil",
+            blockTitle: "Bloquer utilisateur",
+            blockMessage: "Êtes-vous sûr de vouloir bloquer cet utilisateur?",
+            blockConfirm: "Bloquer",
+            blockCancel: "Annuler",
+            saveFiltersTitle: "Sauvegarder filtres",
+            filterNamePlaceholder: "Nom du filtre",
+            saveFiltersBtn: "Sauvegarder",
+            saveFiltersCancel: "Annuler",
+            workersCount: "Travailleurs disponibles",
+            avgRating: "Note moyenne",
+            lastSeenMinutes: "Dernière vue il y a",
+            lastSeenHours: "Dernière vue il y a",
+            lastSeenDays: "Dernière vue il y a",
+            minutes: "min",
+            hours: "h",
+            days: "j",
+            sendLocation: "Envoyer position",
+            blockUser: "Bloquer",
+            male: "Homme",
+            female: "Femme",
+            allGenders: "Tous les genres",
+            forgotPass: "? Mot de passe oublié"
+        },
+        en: { 
+            login: "Login", 
+            signup: "Sign Up", 
+            btnLogin: "Login", 
+            btnSignup: "Register", 
+            toggleL: "Have account? Login", 
+            toggleS: "Create account", 
+            logout: "Logout", 
+            patron: "Employer", 
+            worker: "Job Seeker", 
+            homme: "Male", 
+            femme: "Female", 
+            loc: "My Location", 
+            edit: "Edit", 
+            inbox: "Inbox", 
+            save: "Save", 
+            cancel: "Cancel", 
+            rate: "Rate", 
+            chat: "Chat", 
+            km: "km", 
+            allC: "All Cities", 
+            allP: "All Jobs", 
+            new: "New", 
+            write: "Type...", 
+            waiter: "Waiter", 
+            chef: "Chef", 
+            barista: "Barista", 
+            barman: "Barman", 
+            pastry: "Pastry", 
+            cleaner: "Cleaner", 
+            security: "Security", 
+            delivery: "Delivery", 
+            receptionist: "Reception", 
+            nameP: "Full Name", 
+            emailP: "Email", 
+            passP: "Password",
+            findTitle: "Find Staff in Minutes", 
+            findSub: "Hire Baristas, Waiters & Chefs Near You", 
+            availTitle: "Available Staff:",
+            availText: "Online", 
+            offlineText: "Offline", 
+            hireBtn: "Message", 
+            navHome: "Home", 
+            navMsg: "Messages", 
+            navProf: "Profile",
+            noWorkers: "No workers available",
+            noMessages: "No messages yet",
+            ratingSubmitted: "Rating submitted, thank you!",
+            locationUpdated: "Location updated",
+            profileSaved: "Profile saved",
+            profileShared: "Profile copied",
+            locationSent: "Location sent",
+            userBlocked: "User blocked",
+            filtersSaved: "Filters saved",
+            allDistances: "All distances",
+            dist5: "Within 5 km",
+            dist10: "Within 10 km",
+            dist20: "Within 20 km",
+            dist50: "Within 50 km",
+            saveFilter: "Save filter",
+            loadFilter: "Load filter",
+            shareProfile: "Share profile",
+            blockTitle: "Block user",
+            blockMessage: "Are you sure you want to block this user?",
+            blockConfirm: "Block",
+            blockCancel: "Cancel",
+            saveFiltersTitle: "Save filters",
+            filterNamePlaceholder: "Filter name",
+            saveFiltersBtn: "Save",
+            saveFiltersCancel: "Cancel",
+            workersCount: "Available workers",
+            avgRating: "Average rating",
+            lastSeenMinutes: "Last seen",
+            lastSeenHours: "Last seen",
+            lastSeenDays: "Last seen",
+            minutes: "min ago",
+            hours: "h ago",
+            days: "d ago",
+            sendLocation: "Send location",
+            blockUser: "Block",
+            male: "Male",
+            female: "Female",
+            allGenders: "All genders",
+            forgotPass: "? Forgot password"
+        }
+    };
+
+    // دالة عرض الإشعارات
+    function showToast(message, duration = 3000) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.style.display = 'block';
+        
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.style.display = 'none';
+        }, duration);
+    }
+
+    // إشعار سطح المكتب
+    function showNotification(title, body) {
+        if (Notification.permission === "granted") {
+            new Notification(title, { body });
+        }
+    }
+
+    // دالة إعادة تعيين كلمة المرور
+    async function resetPassword() {
+        const email = document.getElementById('email').value;
+        if (!email) {
+            showToast("الرجاء إدخال البريد الإلكتروني");
+            return;
+        }
+        try {
+            await auth.sendPasswordResetEmail(email);
+            showToast("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
+        } catch (e) {
+            showToast(e.message);
+        }
+    }
+
+    // تنسيق رقم الهاتف للواتساب
+    function formatWaPhone(phone) {
+        if (!phone) return "";
+        let p = phone.replace(/\D/g, ''); 
+        if (p.startsWith('0')) return '212' + p.substring(1);
+        if (!p.startsWith('212')) return '212' + p; 
+        return p;
+    }
+
+    // تبديل التبويبات
+    function switchTab(tab) {
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        
+        if(tab === 'home') {
+            document.getElementById('ownerHomeTab').style.display = 'block';
+            document.getElementById('ownerMessagesTab').style.display = 'none';
+            document.getElementById('navHome').classList.add('active');
+            if(map) setTimeout(() => map.invalidateSize(), 200);
+        } else if(tab === 'messages') {
+            document.getElementById('ownerHomeTab').style.display = 'none';
+            document.getElementById('ownerMessagesTab').style.display = 'block';
+            document.getElementById('navMsg').classList.add('active');
+            loadInbox();
+        }
+    }
+
+    // تبديل الوضع المظلم
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        
+        const icon = document.querySelector('#darkModeBtn i');
+        if (icon) {
+            icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+        }
+    }
+
+    // تحميل الوضع المظلم من التخزين
+    function loadDarkMode() {
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+            const icon = document.querySelector('#darkModeBtn i');
+            if (icon) icon.className = 'fas fa-sun';
+        }
+    }
+
+    // تطبيق اللغة
+    function applyLanguage(lang) {
+        const d = i18n[lang];
+        
+        const currentCityFilter = document.getElementById('cityFilter').value;
+        const currentProfFilter = document.getElementById('profFilter').value;
+        const currentGenderFilter = document.getElementById('genderFilter').value;
+        const currentDistanceFilter = document.getElementById('distanceFilter').value;
+        
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        
+        const elements = {
+            'btnSubmit': isLogin ? d.btnLogin : d.btnSignup,
+            'toggleTxt': isLogin ? d.toggleS : d.toggleL,
+            'optOwner': d.patron, 
+            'optWorker': d.worker, 
+            'btnLogout': d.logout,
+            'inboxTitle': d.inbox, 
+            'ownerInboxTitle': d.inbox,
+            'editTitle': d.edit, 
+            'btnSave': d.save, 
+            'btnCancel': d.cancel, 
+            'cancelRate': d.cancel,
+            'rateTitle': d.rate, 
+            'btnRateSubmit': d.save,
+            'txtFindTitle': d.findTitle, 
+            'txtFindSub': d.findSub, 
+            'txtAvailTitle': d.availTitle, 
+            'txtNavHome': d.navHome, 
+            'txtNavMsg': d.navMsg, 
+            'txtNavProf': d.navProf,
+            'logoutText': d.logout,
+            'allDistances': d.allDistances,
+            'dist5': d.dist5,
+            'dist10': d.dist10,
+            'dist20': d.dist20,
+            'dist50': d.dist50,
+            'saveFilterText': d.saveFilter,
+            'loadFilterText': d.loadFilter,
+            'shareProfileText': d.shareProfile,
+            'blockTitle': d.blockTitle,
+            'blockMessage': d.blockMessage,
+            'blockConfirm': d.blockConfirm,
+            'blockCancel': d.blockCancel,
+            'saveFiltersTitle': d.saveFiltersTitle,
+            'saveFiltersBtn': d.saveFiltersBtn,
+            'saveFiltersCancel': d.saveFiltersCancel,
+            'workersLabel': d.workersCount,
+            'ratingLabel': d.avgRating,
+            'allGenders': d.allGenders,
+            'maleGender': d.male,
+            'femaleGender': d.female,
+            'forgotPassText': d.forgotPass
+        };
+        
+        for (let id in elements) { 
+            const element = document.getElementById(id);
+            if (element) {
+                if (id === 'btnLoc' || id === 'btnEdit') {
+                    const span = element.querySelector('span');
+                    if (span) span.innerText = elements[id];
+                } else {
+                    element.innerText = elements[id];
+                }
+            }
+        }
+
+        document.getElementById('email').placeholder = d.emailP;
+        document.getElementById('password').placeholder = d.passP;
+        if (document.getElementById('regName')) {
+            document.getElementById('regName').placeholder = d.nameP;
+        }
+        document.getElementById('chatInput').placeholder = d.write;
+        document.getElementById('filterName').placeholder = d.filterNamePlaceholder;
+
+        const gOpts = `<option value="homme">${d.homme}</option><option value="femme">${d.femme}</option>`;
+        document.getElementById('regGender').innerHTML = gOpts; 
+        document.getElementById('editGender').innerHTML = gOpts;
+
+        // تحديث قائمة المدن
+        let cityOptions = '';
+        if (lang === 'ar') {
+            cityOptions = moroccanCities.map(c => `<option value="${c}">${c}</option>`).join('');
+        } else if (lang === 'fr') {
+            const frenchCities = {
+                "الدار البيضاء": "Casablanca",
+                "الرباط": "Rabat",
+                "مراكش": "Marrakech",
+                "فاس": "Fès",
+                "طنجة": "Tanger",
+                "أكادير": "Agadir",
+                "مكناس": "Meknès",
+                "وجدة": "Oujda",
+                "القنيطرة": "Kénitra",
+                "تطوان": "Tétouan"
+            };
+            cityOptions = moroccanCities.map(c => `<option value="${c}">${frenchCities[c] || c}</option>`).join('');
+        } else {
+            const englishCities = {
+                "الدار البيضاء": "Casablanca",
+                "الرباط": "Rabat",
+                "مراكش": "Marrakech",
+                "فاس": "Fes",
+                "طنجة": "Tangier",
+                "أكادير": "Agadir",
+                "مكناس": "Meknes",
+                "وجدة": "Oujda",
+                "القنيطرة": "Kenitra",
+                "تطوان": "Tetouan"
+            };
+            cityOptions = moroccanCities.map(c => `<option value="${c}">${englishCities[c] || c}</option>`).join('');
+        }
+        
+        document.querySelectorAll('.city-list').forEach(s => s.innerHTML = cityOptions);
+        
+        const cityFilter = document.getElementById('cityFilter');
+        if (cityFilter) {
+            cityFilter.innerHTML = `<option value="">${d.allC}</option>` + cityOptions;
+            if (currentCityFilter && moroccanCities.includes(currentCityFilter)) {
+                cityFilter.value = currentCityFilter;
+            }
+        }
+
+        // تحديث قائمة المهن
+        let profOptions = '';
+        if (lang === 'ar') {
+            profOptions = Object.keys(jobs).map(k => `<option value="${k}">${jobNamesAr[k]}</option>`).join('');
+        } else if (lang === 'fr') {
+            const frenchJobs = {
+                waiter: 'Serveur',
+                chef: 'Chef',
+                barista: 'Barista',
+                barman: 'Barman',
+                pastry: 'Pâtissier',
+                cleaner: 'Nettoyeur',
+                security: 'Agent de sécurité',
+                delivery: 'Livreur',
+                receptionist: 'Réceptionniste'
+            };
+            profOptions = Object.keys(jobs).map(k => `<option value="${k}">${frenchJobs[k]}</option>`).join('');
+        } else {
+            const englishJobs = {
+                waiter: 'Waiter',
+                chef: 'Chef',
+                barista: 'Barista',
+                barman: 'Barman',
+                pastry: 'Pastry Chef',
+                cleaner: 'Cleaner',
+                security: 'Security Guard',
+                delivery: 'Delivery Driver',
+                receptionist: 'Receptionist'
+            };
+            profOptions = Object.keys(jobs).map(k => `<option value="${k}">${englishJobs[k]}</option>`).join('');
+        }
+        
+        document.querySelectorAll('.prof-list').forEach(s => s.innerHTML = profOptions);
+        
+        const profFilter = document.getElementById('profFilter');
+        if (profFilter) {
+            profFilter.innerHTML = `<option value="">${d.allP}</option>` + profOptions;
+            if (currentProfFilter && Object.keys(jobs).includes(currentProfFilter)) {
+                profFilter.value = currentProfFilter;
+            }
+        }
+
+        // تحديث فلتر الجنس
+        const genderFilter = document.getElementById('genderFilter');
+        if (genderFilter) {
+            genderFilter.innerHTML = `<option value="">${d.allGenders}</option><option value="homme">👨 ${d.male}</option><option value="femme">👩 ${d.female}</option>`;
+            if (currentGenderFilter && (currentGenderFilter === 'homme' || currentGenderFilter === 'femme')) {
+                genderFilter.value = currentGenderFilter;
+            }
+        }
+
+        const distanceFilter = document.getElementById('distanceFilter');
+        if (distanceFilter && currentDistanceFilter) {
+            distanceFilter.value = currentDistanceFilter;
+        }
+
+        if(currentUser) { 
+            if(currentUser.role === 'owner') {
+                loadWorkers(); 
+            } else {
+                updateWorkerUI(); 
+            }
+        }
+        
+        document.getElementById('langAuth').value = lang;
+        document.getElementById('langDash').value = lang;
+    }
+
+    // تبديل بين تسجيل الدخول والتسجيل
+    function toggleAuth() { 
+        isLogin = !isLogin; 
+        document.getElementById('signupOnly').style.display = isLogin ? 'none' : 'block'; 
+        applyLanguage(document.getElementById('langAuth').value); 
+    }
+
+    // معالجة المصادقة
+    async function handleAuth() {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('password').value;
+        
+        if (!email || !pass) {
+            showToast("الرجاء ملء جميع الحقول");
+            return;
+        }
+        
+        try {
+            if(isLogin) {
+                await auth.signInWithEmailAndPassword(email, pass);
+                showToast("تم تسجيل الدخول بنجاح");
+            } else {
+                const name = document.getElementById('regName').value;
+                if (!name) {
+                    showToast("الرجاء إدخال الاسم الكامل");
+                    return;
+                }
+                
+                const res = await auth.createUserWithEmailAndPassword(email, pass);
+                const role = document.getElementById('regRole').value;
+                
+                const data = { 
+                    uid: res.user.uid, 
+                    name: name, 
+                    gender: document.getElementById('regGender').value, 
+                    role: role, 
+                    email: email, 
+                    avgRating: 0, 
+                    numReviews: 0, 
+                    online: true,
+                    proMember: false,
+                    lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                if(role === 'worker') { 
+                    data.city = document.getElementById('regCity').value; 
+                    data.profession = document.getElementById('regProf').value; 
+                    data.phone = document.getElementById('regPhone').value; 
+                    data.lat = 33.5; 
+                    data.lng = -7.5; 
+                }
+                
+                await db.collection("users").doc(res.user.uid).set(data);
+                showToast("تم إنشاء الحساب بنجاح");
+            }
+        } catch(e) {
+            let errorMessage = e.message;
+            if (e.code === 'auth/email-already-in-use') errorMessage = 'البريد الإلكتروني مستخدم بالفعل';
+            else if (e.code === 'auth/invalid-email') errorMessage = 'البريد الإلكتروني غير صالح';
+            else if (e.code === 'auth/weak-password') errorMessage = 'كلمة السر ضعيفة - يجب أن تكون 6 أحرف على الأقل';
+            
+            showToast(errorMessage);
+        }
+    }
+
+    // مراقبة حالة المصادقة
+    auth.onAuthStateChanged(async user => {
+        if(user) {
+            await db.collection("users").doc(user.uid).update({ 
+                online: true,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            const doc = await db.collection("users").doc(user.uid).get();
+            currentUser = doc.data();
+            
+            document.getElementById('authPage').classList.remove('active'); 
+            document.getElementById('dashPage').classList.add('active');
+            
+            loadDarkMode();
+            applyLanguage(document.getElementById('langAuth').value);
+            loadSavedFiltersFromStorage();
+            
+            if(currentUser.role === 'owner') { 
+                document.getElementById('ownerView').style.display='block'; 
+                document.getElementById('workerView').style.display='none';
+                switchTab('home'); 
+                initMap(); 
+            } else { 
+                document.getElementById('workerView').style.display='block'; 
+                document.getElementById('ownerView').style.display='none';
+                updateWorkerUI(); 
+            }
+            
+            loadInbox();
+        } else { 
+            currentUser = null; 
+            document.getElementById('dashPage').classList.remove('active'); 
+            document.getElementById('authPage').classList.add('active'); 
+        }
+    });
+
+    // تحديث الحالة عند إغلاق الصفحة
+    window.addEventListener('beforeunload', () => {
+        if (auth.currentUser) {
+            db.collection("users").doc(auth.currentUser.uid).update({ 
+                online: false,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+    });
+
+    // تهيئة الخريطة
+    function initMap() {
+        if(!map) { 
+            map = L.map('map').setView([33.5, -7.5], 6); 
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map); 
+        }
+        
+        navigator.geolocation.getCurrentPosition(p => {
+            ownerPos = {lat: p.coords.latitude, lng: p.coords.longitude}; 
+            
+            L.marker([ownerPos.lat, ownerPos.lng], {
+                icon: L.divIcon({
+                    html: `<div style="background:#25D366; border:3px solid white; border-radius:50%; width:24px; height:24px; box-shadow:0 0 15px rgba(0,0,0,0.5);"></div>`, 
+                    className: ''
+                })
+            }).addTo(map);
+            
+            map.setView([ownerPos.lat, ownerPos.lng], 12); 
+            loadWorkers();
+        }, () => {
+            loadWorkers();
+        });
+    }
+
+    // حفظ الفلاتر في التخزين المحلي
+    function saveFiltersToStorage() {
+        const filters = {
+            city: document.getElementById('cityFilter').value,
+            profession: document.getElementById('profFilter').value,
+            gender: document.getElementById('genderFilter').value,
+            distance: document.getElementById('distanceFilter').value
+        };
+        localStorage.setItem('currentFilters', JSON.stringify(filters));
+    }
+
+    // تحميل الفلاتر من التخزين المحلي
+    function loadSavedFiltersFromStorage() {
+        const saved = localStorage.getItem('currentFilters');
+        if (saved) {
+            const filters = JSON.parse(saved);
+            if (filters.city) document.getElementById('cityFilter').value = filters.city;
+            if (filters.profession) document.getElementById('profFilter').value = filters.profession;
+            if (filters.gender) document.getElementById('genderFilter').value = filters.gender;
+            if (filters.distance) document.getElementById('distanceFilter').value = filters.distance;
+        }
+    }
+
+    // فتح مودال حفظ الفلاتر
+    function openSaveFiltersModal() {
+        document.getElementById('filterName').value = '';
+        document.getElementById('saveFiltersModal').style.display = 'flex';
+    }
+
+    // حفظ الفلاتر المفضلة
+    function saveFilters() {
+        const name = document.getElementById('filterName').value;
+        if (!name) {
+            showToast("الرجاء إدخال اسم للفلتر");
+            return;
+        }
+        
+        const filters = {
+            city: document.getElementById('cityFilter').value,
+            profession: document.getElementById('profFilter').value,
+            gender: document.getElementById('genderFilter').value,
+            distance: document.getElementById('distanceFilter').value,
+            name: name
+        };
+        
+        let savedFilters = JSON.parse(localStorage.getItem('savedFiltersList') || '[]');
+        savedFilters.push(filters);
+        localStorage.setItem('savedFiltersList', JSON.stringify(savedFilters));
+        
+        closeModal('saveFiltersModal');
+        showToast(i18n[document.documentElement.lang].filtersSaved);
+    }
+
+    // تحميل الفلاتر المحفوظة
+    function loadSavedFilters() {
+        const savedFilters = JSON.parse(localStorage.getItem('savedFiltersList') || '[]');
+        if (savedFilters.length === 0) {
+            showToast("لا توجد فلاتر محفوظة");
+            return;
+        }
+        
+        const filterNames = savedFilters.map(f => f.name).join('\n');
+        const selected = prompt("اختر الفلتر:\n" + filterNames);
+        if (selected) {
+            const filter = savedFilters.find(f => f.name === selected);
+            if (filter) {
+                if (filter.city) document.getElementById('cityFilter').value = filter.city;
+                if (filter.profession) document.getElementById('profFilter').value = filter.profession;
+                if (filter.gender) document.getElementById('genderFilter').value = filter.gender;
+                if (filter.distance) document.getElementById('distanceFilter').value = filter.distance;
+                loadWorkers();
+            }
+        }
+    }
+
+    // تحميل قائمة العمال مع الفلاتر
+    async function loadWorkers() {
+        const lang = document.documentElement.lang; 
+        const d = i18n[lang]; 
+        
+        if (map) {
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+        }
+
+        const cF = document.getElementById('cityFilter').value;
+        const pF = document.getElementById('profFilter').value;
+        const gF = document.getElementById('genderFilter').value;
+        const dF = document.getElementById('distanceFilter')?.value;
+        
+        const snap = await db.collection("users")
+            .where("role", "==", "worker")
+            .get();
+            
+        const list = document.getElementById('workersList');
+        list.innerHTML = '';
+        
+        let hasWorkers = false;
+        let workersCount = 0;
+        let totalRating = 0;
+        let ratingCount = 0;
+        
+        snap.forEach(doc => {
+            const w = doc.data();
+            
+            const dist = ownerPos && w.lat ? 
+                parseFloat(calcDist(ownerPos.lat, ownerPos.lng, w.lat, w.lng)) : null;
+            
+            let passFilter = true;
+            if (cF && w.city !== cF) passFilter = false;
+            if (pF && w.profession !== pF) passFilter = false;
+            if (gF && w.gender !== gF) passFilter = false;
+            if (dF && dist && dist > parseFloat(dF)) passFilter = false;
+            
+            if (passFilter) {
+                hasWorkers = true;
+                workersCount++;
+                
+                if (w.avgRating) {
+                    totalRating += w.avgRating;
+                    ratingCount++;
+                }
+                
+                // إضافة علامة على الخريطة بإيموجي المهمة
+                if(w.lat && map) {
+                    const jobEmoji = jobs[w.profession] || '👤';
+                    const isOnline = w.online === true;
+                    markers.push(L.marker([w.lat, w.lng], {
+                        icon: L.divIcon({
+                            html: `<div style="background:white; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 2px 8px rgba(0,0,0,0.2); border:2px solid ${isOnline ? '#2ecc71' : '#95a5a6'};">${jobEmoji}</div>`, 
+                            className: ''
+                        })
+                    }).addTo(map));
+                }
+                
+                const distText = dist ? `${dist} ${d.km}` : '';
+                const avatarEmoji = jobs[w.profession] || '👤';
+                
+                const genderIcon = w.gender === 'femme' ? '👩' : '👨';
+                const genderClass = w.gender === 'femme' ? 'female' : 'male';
+                
+                const isOnline = w.online === true;
+                const proBadge = w.proMember ? '<span class="pro-badge">PRO</span>' : '';
+                
+                // حساب نص آخر ظهور
+                let lastSeenText = '';
+                if (!isOnline && w.lastSeen) {
+                    const lastSeen = w.lastSeen.toDate();
+                    const diff = Math.floor((Date.now() - lastSeen) / 60000);
+                    if (diff < 60) lastSeenText = `· ${d.lastSeenMinutes} ${diff} ${d.minutes}`;
+                    else if (diff < 1440) lastSeenText = `· ${d.lastSeenHours} ${Math.floor(diff/60)} ${d.hours}`;
+                    else lastSeenText = `· ${d.lastSeenDays} ${Math.floor(diff/1440)} ${d.days}`;
+                }
+                
+                const rating = w.avgRating ? w.avgRating.toFixed(1) : d.new;
+                
+                list.innerHTML += `
+                <div class="worker-card">
+                    <div class="worker-avatar-wrapper">
+                        <div class="worker-avatar">${avatarEmoji}</div>
+                        <div class="online-badge ${isOnline ? 'online' : 'offline'}"></div>
+                    </div>
+                    
+                    <div class="worker-info">
+                        <div class="worker-header">
+                            <div class="worker-name-section">
+                                <span class="worker-name">${w.name}</span>
+                                <span class="gender-icon ${genderClass}" title="${d[w.gender]}">${genderIcon}</span>
+                                ${proBadge}
+                            </div>
+                            <div class="rating-badge">
+                                <i class="fas fa-star" style="color: var(--gold); font-size: 12px;"></i>
+                                <span>${rating}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="worker-details">
+                            <div class="detail-item">
+                                <i class="fas fa-briefcase"></i>
+                                <span>${jobNamesAr[w.profession]}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${w.city} ${distText ? '· ' + distText : ''}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="worker-status">
+                            <div class="status-indicator ${isOnline ? 'online' : 'offline'}">
+                                <span class="status-dot"></span>
+                                <span>${isOnline ? d.availText : d.offlineText}</span>
+                            </div>
+                            ${lastSeenText ? `<span class="last-seen">${lastSeenText}</span>` : ''}
+                        </div>
+                        
+                        <div class="quick-rating">
+                            ${[1,2,3,4,5].map(r => 
+                                `<span onclick="quickRate('${w.uid}', ${r})" style="color:${r <= Math.round(w.avgRating||0) ? 'var(--gold)' : '#ddd'};">★</span>`
+                            ).join('')}
+                        </div>
+                        
+                        <div class="card-actions">
+                            <button class="btn-wa" onclick="window.open('https://wa.me/${formatWaPhone(w.phone)}', '_blank')">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="btn-hire" onclick="openChat('${w.uid}', '${w.name}')">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                            <button class="btn-action-small" onclick="openRate('${w.uid}')">
+                                <i class="fas fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        });
+        
+        // تحديث الإحصائيات
+        const statsCard = document.getElementById('statsCard');
+        const workersCountSpan = document.getElementById('workersCount');
+        const avgRatingSpan = document.getElementById('avgRating');
+        
+        if (statsCard) {
+            const avgRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : "0.0";
+            if (workersCountSpan) workersCountSpan.innerText = workersCount;
+            if (avgRatingSpan) avgRatingSpan.innerText = avgRating;
+            statsCard.style.display = workersCount > 0 ? 'flex' : 'none';
+        }
+        
+        if (!hasWorkers) {
+            list.innerHTML = `<div class="empty-state"><i class="fas fa-users-slash"></i><p>${d.noWorkers}</p></div>`;
+        }
+    }
+
+    // حساب المسافة
+    function calcDist(lat1, lon1, lat2, lon2) { 
+        const R = 6371; 
+        const dLat = (lat2-lat1)*Math.PI/180; 
+        const dLon = (lon2-lon1)*Math.PI/180; 
+        const a = Math.sin(dLat/2)*Math.sin(dLat/2) + 
+                  Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); 
+        return (R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1); 
+    }
+    
+    // فتح نافذة التقييم
+    function openRate(id) { 
+        selectedWorkerId = id; 
+        setRating(0); 
+        document.getElementById('rateModal').style.display='flex'; 
+    }
+    
+    // تعيين التقييم
+    function setRating(v) { 
+        currentRating = v; 
+        document.querySelectorAll('.star-input').forEach((s,i) => {
+            s.style.color = i < v ? 'var(--gold)' : '#ccc';
+        }); 
+    }
+    
+    // إرسال التقييم
+    async function submitRating() { 
+        if(!currentRating) return; 
+        
+        const ref = db.collection("users").doc(selectedWorkerId); 
+        const doc = await ref.get(); 
+        const data = doc.data(); 
+        const newCount = (data.numReviews || 0) + 1; 
+        const newAvg = ((data.avgRating || 0) * (data.numReviews || 0) + currentRating) / newCount; 
+        
+        await ref.update({ avgRating: newAvg, numReviews: newCount }); 
+        closeModal('rateModal'); 
+        loadWorkers(); 
+        
+        const lang = document.documentElement.lang;
+        showToast(i18n[lang].ratingSubmitted);
+    }
+    
+    // تقييم سريع
+    async function quickRate(uid, rating) {
+        if (!confirm(`تقييم بـ ${rating} نجوم؟`)) return;
+        selectedWorkerId = uid;
+        currentRating = rating;
+        await submitRating();
+    }
+    
+    // فتح نافذة التعديل
+    function openEdit() { 
+        document.getElementById('editName').value = currentUser.name || ''; 
+        document.getElementById('editPhone').value = currentUser.phone || ''; 
+        document.getElementById('editGender').value = currentUser.gender || 'homme'; 
+        document.getElementById('editCity').value = currentUser.city || moroccanCities[0]; 
+        document.getElementById('editProf').value = currentUser.profession || 'waiter'; 
+        document.getElementById('editModal').style.display = 'flex'; 
+    }
+    
+    // حفظ التعديلات
+    async function saveProfile() { 
+        const data = { 
+            name: document.getElementById('editName').value, 
+            gender: document.getElementById('editGender').value, 
+            phone: document.getElementById('editPhone').value, 
+            city: document.getElementById('editCity').value, 
+            profession: document.getElementById('editProf').value 
+        }; 
+        
+        await db.collection("users").doc(auth.currentUser.uid).update(data); 
+        currentUser = { ...currentUser, ...data }; 
+        
+        if(currentUser.role === 'worker') {
+            updateWorkerUI(); 
+        }
+        
+        closeModal('editModal'); 
+        
+        const lang = document.documentElement.lang;
+        showToast(i18n[lang].profileSaved);
+    }
+
+    // مشاركة الملف الشخصي
+    function shareProfile() {
+        if (!currentUser) return;
+        
+        const lang = document.documentElement.lang;
+        const profName = jobNamesAr[currentUser.profession] || currentUser.profession;
+        const genderIcon = currentUser.gender === 'femme' ? '👩' : '👨';
+        
+        const profileData = `
+            *${currentUser.name}* ${genderIcon}
+            🧑‍🍳 ${profName}
+            📍 ${currentUser.city}
+            📞 ${currentUser.phone || ''}
+            ⭐ ${currentUser.avgRating ? currentUser.avgRating.toFixed(1) : i18n[lang].new}
+        `;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: i18n[lang].shareProfile,
+                text: profileData,
+            }).catch(console.error);
+        } else {
+            navigator.clipboard.writeText(profileData);
+            showToast(i18n[lang].profileShared);
+        }
+    }
+
+    // فتح المحادثة
+    function openChat(tUid, tName) { 
+        currentChatId = [auth.currentUser.uid, tUid].sort().join('_'); 
+        currentChatTarget = tUid;
+        document.getElementById('chatTargetName').innerText = tName; 
+        document.getElementById('chatOverlay').style.display = 'flex'; 
+        
+        db.collection("chats").doc(currentChatId).update({ 
+            read: true,
+            lastSenderId: auth.currentUser.uid 
+        }).catch(() => {});
+        
+        if(unsubChat) unsubChat(); 
+        
+        unsubChat = db.collection("chats")
+            .doc(currentChatId)
+            .collection("messages")
+            .orderBy("timestamp", "asc")
+            .onSnapshot(snap => { 
+                const box = document.getElementById('chatMsgs'); 
+                box.innerHTML = ''; 
+                
+                snap.forEach(d => { 
+                    const m = d.data(); 
+                    let messageText = m.text;
+                    
+                    if (messageText.includes('maps.google.com')) {
+                        messageText = `<a href="${messageText}" target="_blank" class="msg-location">📍 ${i18n[document.documentElement.lang].locationSent}</a>`;
+                    }
+                    
+                    box.innerHTML += `<div class="msg ${m.senderId === auth.currentUser.uid ? 'sent' : 'recv'}">${messageText}</div>`; 
+                    
+                    if (m.senderId !== auth.currentUser.uid && document.getElementById('chatOverlay').style.display !== 'flex') {
+                        showNotification(i18n[document.documentElement.lang].chat, i18n[document.documentElement.lang].chat + ' ' + tName);
+                    }
+                }); 
+                
+                box.scrollTop = box.scrollHeight; 
+            }); 
+    }
+
+    // إرسال رسالة
+    async function sendMsg() { 
+        const txt = document.getElementById('chatInput').value; 
+        if(!txt) return; 
+        
+        const target = currentChatId.split('_').find(id => id !== auth.currentUser.uid);
+        
+        await db.collection("chats").doc(currentChatId).set({ 
+            participants: [auth.currentUser.uid, target], 
+            lastSenderId: auth.currentUser.uid, 
+            read: false, 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        }, {merge: true}); 
+        
+        await db.collection("chats")
+            .doc(currentChatId)
+            .collection("messages")
+            .add({ 
+                text: txt, 
+                senderId: auth.currentUser.uid, 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            }); 
+        
+        document.getElementById('chatInput').value = ''; 
+    }
+
+    // إرسال الموقع
+    function shareLocation() {
+        navigator.geolocation.getCurrentPosition(pos => {
+            const locationMsg = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+            document.getElementById('chatInput').value = locationMsg;
+            sendMsg();
+            
+            const lang = document.documentElement.lang;
+            showToast(i18n[lang].locationSent);
+        });
+    }
+
+    // فتح مودال الحظر
+    function openBlockModal() {
+        document.getElementById('blockModal').style.display = 'flex';
+    }
+
+    // تأكيد الحظر
+    async function confirmBlock() {
+        if (!currentChatTarget) return;
+        
+        await db.collection("blocks").add({
+            blockerId: auth.currentUser.uid,
+            blockedId: currentChatTarget,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        closeModal('blockModal');
+        closeChat();
+        
+        const lang = document.documentElement.lang;
+        showToast(i18n[lang].userBlocked);
+    }
+
+    // تحميل صندوق الوارد
+    function loadInbox() { 
+        if (!currentUser) return;
+        
+        const boxId = (currentUser.role === 'owner') ? 'ownerInbox' : 'workerInbox';
+        const box = document.getElementById(boxId);
+        if (!box) return;
+        
+        box.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>جاري التحميل...</p></div>';
+        
+        db.collection("chats")
+            .where("participants", "array-contains", auth.currentUser.uid)
+            .onSnapshot(async snapshot => { 
+                if (snapshot.empty) {
+                    const lang = document.documentElement.lang;
+                    box.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>${i18n[lang].noMessages}</p></div>`;
+                    
+                    const badge = document.getElementById('msgBadge');
+                    if(badge) badge.style.display = 'none';
+                    return;
+                }
+                
+                box.innerHTML = '';
+                let unreadTotal = 0; 
+                
+                const chatPromises = snapshot.docs.map(async (doc) => {
+                    const chatData = doc.data(); 
+                    const other = chatData.participants.find(id => id !== auth.currentUser.uid);
+                    const hasNew = (chatData.read === false && chatData.lastSenderId !== auth.currentUser.uid);
+                    
+                    if(hasNew) unreadTotal++;
+                    
+                    let uData = usersCache[other];
+                    if (!uData) {
+                        try {
+                            const u = await db.collection("users").doc(other).get(); 
+                            if(u.exists) {
+                                uData = u.data();
+                                usersCache[other] = uData;
+                            }
+                        } catch (e) {
+                            console.error("Error loading user:", e);
+                        }
+                    }
+                    
+                    return { 
+                        id: doc.id,
+                        chatData, 
+                        other, 
+                        hasNew, 
+                        uData,
+                        timestamp: chatData.timestamp?.toMillis() || 0
+                    };
+                });
+                
+                try {
+                    const chats = await Promise.all(chatPromises);
+                    
+                    const validChats = chats.filter(c => c.uData);
+                    validChats.sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    if (validChats.length === 0) {
+                        const lang = document.documentElement.lang;
+                        box.innerHTML = `<div class="empty-state"><i class="fas fa-inbox"></i><p>${i18n[lang].noMessages}</p></div>`;
+                    } else {
+                        validChats.forEach(({ other, hasNew, uData }) => {
+                            const lastSeen = uData.lastSeen?.toDate();
+                            let lastSeenText = '';
+                            if (lastSeen && !uData.online) {
+                                const diff = Math.floor((Date.now() - lastSeen) / 3600000);
+                                if (diff < 24) lastSeenText = `· ${i18n[document.documentElement.lang].lastSeenHours} ${diff} ${i18n[document.documentElement.lang].hours}`;
+                            }
+                            
+                            const genderIcon = uData.gender === 'femme' ? '👩' : '👨';
+                            
+                            box.innerHTML += `
+                            <div class="chat-list-item" onclick="openChat('${other}', '${uData.name}')">
+                                <div style="display:flex; align-items:center; gap:12px; width:100%;">
+                                    <div style="width:45px; height:45px; border-radius:15px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; font-size:24px;">
+                                        ${jobs[uData.profession] || '👤'}
+                                    </div>
+                                    <div style="flex:1">
+                                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                                            <b style="font-size:16px;">
+                                                ${uData.name} 
+                                                <span style="font-size:14px;" title="${i18n[document.documentElement.lang][uData.gender]}">${genderIcon}</span>
+                                            </b>
+                                            ${hasNew ? '<span class="badge-new">' + i18n[document.documentElement.lang].new + '</span>' : ''}
+                                        </div>
+                                        <p style="color:#888; font-size:12px; margin-top:3px;">
+                                            ${jobNamesAr[uData.profession] || uData.profession || ''} ${lastSeenText}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>`; 
+                        });
+                    }
+                    
+                    const badge = document.getElementById('msgBadge');
+                    if(badge) {
+                        if(unreadTotal > 0) { 
+                            badge.innerText = unreadTotal > 9 ? '9+' : unreadTotal; 
+                            badge.style.display = 'block'; 
+                        } else { 
+                            badge.style.display = 'none'; 
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error processing chats:", e);
+                    const lang = document.documentElement.lang;
+                    box.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>خطأ في تحميل الرسائل</p></div>`;
+                }
+            }, error => {
+                console.error("Error loading inbox:", error);
+                const lang = document.documentElement.lang;
+                box.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><p>خطأ في الاتصال</p></div>`;
+            }); 
+    }
+
+    // تحديث واجهة العامل
+    function updateWorkerUI() { 
+        const d = i18n[document.documentElement.lang]; 
+        const genderIcon = currentUser.gender === 'femme' ? '👩' : '👨';
+        
+        document.getElementById('wName').innerHTML = `${currentUser.name} ${genderIcon}`; 
+        
+        const profIcon = jobs[currentUser.profession] || '👤';
+        document.getElementById('wIcon').innerText = profIcon;
+        
+        const rating = currentUser.avgRating ? currentUser.avgRating.toFixed(1) : d.new;
+        document.getElementById('wRating').innerHTML = `★ ${rating}`;
+        
+        const profName = jobNamesAr[currentUser.profession] || currentUser.profession;
+        document.getElementById('wInfo').innerText = `${profName} | ${currentUser.city} | ${currentUser.phone || ''}`; 
+    }
+    
+    // تحديث موقع العامل
+    function updateLoc() { 
+        navigator.geolocation.getCurrentPosition(async p => { 
+            await db.collection("users").doc(auth.currentUser.uid).update({
+                lat: p.coords.latitude, 
+                lng: p.coords.longitude
+            }); 
+            
+            const lang = document.documentElement.lang;
+            showToast(i18n[lang].locationUpdated);
+        }, (error) => {
+            showToast("تعذر الحصول على الموقع، تأكد من تفعيل GPS");
+        }); 
+    }
+    
+    // إغلاق المودال
+    function closeModal(id) { 
+        document.getElementById(id).style.display='none'; 
+    }
+    
+    // إغلاق المحادثة
+    function closeChat() { 
+        document.getElementById('chatOverlay').style.display='none'; 
+        if(unsubChat) {
+            unsubChat();
+            unsubChat = null;
+        }
+    }
+    
+    // تسجيل الخروج
+    function logout() { 
+        if (auth.currentUser) {
+            db.collection("users").doc(auth.currentUser.uid).update({ 
+                online: false,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                auth.signOut(); 
+            });
+        }
+    }
+
+    // تهيئة الصفحة
+    applyLanguage('ar');
+</script>
+</body>
+</html>
