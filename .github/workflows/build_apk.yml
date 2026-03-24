@@ -1,4 +1,4 @@
-name: Generate APK from PWA
+name: Build APK Fast
 on: [push]
 
 jobs:
@@ -6,22 +6,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # تحديث لـ v4
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4 # تحديث لـ v4
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Build APK with Bubblewrap
+      - name: Build APK
         run: |
           npm install -g @bubblewrap/cli
-          # هاد الأمر كياخد المانيفست ديالك ويحولها لـ APK
+          # هاد السطر كيجاوب "نعم" على كاع أسئلة الإعداد أوتوماتيكياً
           yes | bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json
-          yes | bubblewrap build
+          yes | bubblewrap build --skipPasswordPrompt
           
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4 # هذا هو اللي كان مسبب المشكل (تحدث لـ v4)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
+          name: my-pwa-apk
           path: ./*.apk
