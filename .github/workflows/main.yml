@@ -13,18 +13,18 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-
-      - name: Build APK
-        # هنا نخبره أن يستخدم البيئة الموجودة ولا يحاول تثبيت JDK
+      - name: Build APK (Force Build)
         run: |
-          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./
-          bubblewrap build --skipPasswordPrompt
-        env:
-          # تخطي تثبيت SDK و JDK بما أنهما موجودان مسبقاً في runner
-          BUBBLEWRAP_SKIP_JDK_INSTALL: "true"
+          npm install -g @bubblewrap/cli
+          # هاد السطر كيجاوب بـ "y" على كاع الأسئلة أوتوماتيكيا
+          yes | bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./
           
+          # هاد السطر كيبني الـ APK وكيتخطي طلب كلمة السر
+          yes | bubblewrap build --skipPasswordPrompt
+        env:
+          # كنقولو لـ Bubblewrap تخدم بـ Java اللي كاينة في السيرفر
+          BUBBLEWRAP_JDK_PATH: "/usr/lib/jvm/java-17-openjdk-amd64"
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
