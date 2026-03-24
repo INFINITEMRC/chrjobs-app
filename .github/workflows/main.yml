@@ -1,4 +1,4 @@
-name: Generate APK from PWA
+name: Fast APK Generator
 on: [push]
 
 jobs:
@@ -6,27 +6,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4  # تحديث لـ v4
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4 # تحديث لـ v4
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Build APK with Bubblewrap
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Build APK
+        # هنا نخبره أن يستخدم البيئة الموجودة ولا يحاول تثبيت JDK
         run: |
-          npm install -g @bubblewrap/cli
-          # هاد الأمر كياخد المانيفست ديالك ويحولها لـ APK
-          yes | bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json
-          yes | bubblewrap build
+          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./
+          bubblewrap build --skipPasswordPrompt
+        env:
+          # تخطي تثبيت SDK و JDK بما أنهما موجودان مسبقاً في runner
+          BUBBLEWRAP_SKIP_JDK_INSTALL: "true"
           
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4 # هذا هو اللي كان فيه المشكل (تحدث لـ v4)
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
-          path: ./*.apk
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-release-apk
+          name: My-App-APK
           path: ./*.apk
