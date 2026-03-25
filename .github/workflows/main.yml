@@ -8,24 +8,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          node-version: '20'
+
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
+
+      - name: Configure Bubblewrap (The Secret Step)
+        run: |
+          # هاد الخطوة هي اللي كتعطي الأجوبة لـ Bubblewrap بلا ما يسول
+          mkdir -p ~/.bubblewrap
+          echo '{"jdkPath":"/usr/lib/jvm/java-17-openjdk-amd64","androidSdkPath":"/usr/local/lib/android/sdk"}' > ~/.bubblewrap/settings.json
 
       - name: Build APK
         run: |
-          npm install -g @bubblewrap/cli
-          # إنشاء الإعدادات بلا أسئلة
-          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./ --metaData.noStatusUpdate
+          # دابا غادي يدوز نيشان بلا أسئلة
+          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./ --packageId=com.chrjobs.app --appName="CHR Jobs" --noStatusUpdate
+          bubblewrap build --skipPasswordPrompt
           
-          # بناء الـ APK مع إعطاء مسار الجافا اللي أنستالينا الفوق
-          # هاد السطر كيجاوب "y" أوتوماتيكياً
-          printf "y\n" | bubblewrap build --skipPasswordPrompt
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
