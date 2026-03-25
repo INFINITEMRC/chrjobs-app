@@ -8,15 +8,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          node-version: '20'
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: Build APK
+      - name: Build APK (Automatic)
         run: |
           npm install -g @bubblewrap/cli
-          # هاد الأمر كينشئ الملف أوتوماتيكياً بالمعلومات ديالك
+          
+          # هاد الخطوة هي السر: كنزربو عليه وكنصايبو الملف ديال الإعدادات قبل ما يسول
           bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json \
             --directory=./ \
             --packageId=com.chrjobs.app \
@@ -24,12 +26,10 @@ jobs:
             --host=chrsd-ca487.web.app \
             --metaData.noStatusUpdate
             
-          # هاد السطر كيدير البناء (Build) مباشرة بلا ما يسول على JDK
-          bubblewrap build --skipPasswordPrompt --jdkPath=/usr/lib/jvm/java-17-openjdk-amd64
-          
+          # هنا كنعطيوه الأمر باش يخدم بـ Java الموجودة في السيرفر
+          bubblewrap build --skipPasswordPrompt --jdkPath=$JAVA_HOME
         env:
-          # هاد المتغير كيخلي Bubblewrap ما يسولش على التثبيت
-          BUBBLEWRAP_SKIP_JDK_INSTALL: "true"
+          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
