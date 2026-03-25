@@ -1,20 +1,39 @@
-name: Build APK Fast
+name: Build APK Final
 on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/bubblewrap/bubblewrap:latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Generate APK
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build APK
         run: |
-          # هاد الكود كيستعمل حاوية جاهزة فيها كلشي
-          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./
-          bubblewrap build --skipPasswordPrompt
+          npm install -g @bubblewrap/cli
+          
+          # هاد الأمر دابا فيه كاع المعلومات: السمية، الـ ID، والموقع
+          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json \
+            --directory=./ \
+            --packageId=com.chrjobs.app \
+            --appName="CHR Jobs" \
+            --shortName="CHRJobs" \
+            --host=chrsd-ca487.web.app \
+            --startUrl=/ \
+            --themeColor="#000000" \
+            --backgroundColor="#ffffff" \
+            --metaData.noStatusUpdate
+          
+          # دابا غنجاوبو "y" غير على الأسئلة التقنية (JDK/SDK)
+          printf "y\ny\ny\ny\n" | bubblewrap build --skipPasswordPrompt
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
