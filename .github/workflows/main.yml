@@ -8,26 +8,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Build Android App (TWA)
+        # هاد الـ Action هو اللي غيحل لينا المشكل دقة وحدة
+        uses: flayks/pwa-to-apk-action@v1.1.0
         with:
-          node-version: '20'
+          manifest-url: 'https://chrsd-ca487.web.app/manifest.json'
 
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-
-      - name: Configure Bubblewrap (The Secret Step)
-        run: |
-          # هاد الخطوة هي اللي كتعطي الأجوبة لـ Bubblewrap بلا ما يسول
-          mkdir -p ~/.bubblewrap
-          echo '{"jdkPath":"/usr/lib/jvm/java-17-openjdk-amd64","androidSdkPath":"/usr/local/lib/android/sdk"}' > ~/.bubblewrap/settings.json
-
-      - name: Build APK
-        run: |
-          # دابا غادي يدوز نيشان بلا أسئلة
-          bubblewrap init --manifest=https://chrsd-ca487.web.app/manifest.json --directory=./ --packageId=com.chrjobs.app --appName="CHR Jobs" --noStatusUpdate
-          bubblewrap build --skipPasswordPrompt
-          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
