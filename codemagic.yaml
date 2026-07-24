@@ -1,5 +1,5 @@
 # Codemagic — ASC API key via group app_store_credentials
-# APP_STORE_CONNECT_PRIVATE_KEY must be Base64 of the .p8 file (see BUILD-FROM-WINDOWS.md)
+# APP_STORE_CONNECT_PRIVATE_KEY = Base64 of the .p8 file
 
 workflows:
   ios-app-store:
@@ -20,17 +20,18 @@ workflows:
       - name: Prepare App Store Connect API key
         script: |
           echo "$APP_STORE_CONNECT_PRIVATE_KEY" | base64 --decode > /tmp/AuthKey.p8
-          # Fallback if user pasted raw PEM instead of base64
           if ! grep -q "BEGIN PRIVATE KEY" /tmp/AuthKey.p8 2>/dev/null; then
             printf '%s\n' "$APP_STORE_CONNECT_PRIVATE_KEY" > /tmp/AuthKey.p8
           fi
-          ls -la /tmp/AuthKey.p8
           head -n 1 /tmp/AuthKey.p8
       - name: Fetch or create signing files
         script: |
+          # New keypair so Codemagic owns the Distribution certificate private key
+          openssl genrsa -out /tmp/distribution.key 2048
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create \
+            --certificate-key=@file:/tmp/distribution.key \
             --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
             --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
             --private-key @file:/tmp/AuthKey.p8
