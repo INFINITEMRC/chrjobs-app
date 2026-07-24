@@ -1,0 +1,38 @@
+# Codemagic config (must live at repo root)
+# Project sources: ios/CHRJobs
+
+workflows:
+  ios-app-store:
+    name: CHR Jobs iOS → App Store
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.chrjobs.jobs
+      vars:
+        XCODE_PROJECT: "ios/CHRJobs/CHRJobs.xcodeproj"
+        XCODE_SCHEME: "CHRJobs"
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Resolve Swift packages
+        script: |
+          xcodebuild -resolvePackageDependencies \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME"
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
