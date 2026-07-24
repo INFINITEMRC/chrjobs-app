@@ -1,4 +1,5 @@
 # Codemagic — ASC API key via group app_store_credentials
+# APP_STORE_CONNECT_PRIVATE_KEY must be Base64 of the .p8 file (see BUILD-FROM-WINDOWS.md)
 
 workflows:
   ios-app-store:
@@ -16,6 +17,15 @@ workflows:
     scripts:
       - name: Set up keychain
         script: keychain initialize
+      - name: Prepare App Store Connect API key
+        script: |
+          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | base64 --decode > /tmp/AuthKey.p8
+          # Fallback if user pasted raw PEM instead of base64
+          if ! grep -q "BEGIN PRIVATE KEY" /tmp/AuthKey.p8 2>/dev/null; then
+            printf '%s\n' "$APP_STORE_CONNECT_PRIVATE_KEY" > /tmp/AuthKey.p8
+          fi
+          ls -la /tmp/AuthKey.p8
+          head -n 1 /tmp/AuthKey.p8
       - name: Fetch or create signing files
         script: |
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
@@ -23,7 +33,7 @@ workflows:
             --create \
             --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
             --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --private-key "@env:APP_STORE_CONNECT_PRIVATE_KEY"
+            --private-key @file:/tmp/AuthKey.p8
           keychain add-certificates
       - name: Apply provisioning profiles to Xcode project
         script: |
@@ -43,7 +53,7 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        api_key: /tmp/AuthKey.p8
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
