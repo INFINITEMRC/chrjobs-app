@@ -1,5 +1,6 @@
 # Codemagic — ASC API key via group app_store_credentials
 # APP_STORE_CONNECT_PRIVATE_KEY = Base64 of the .p8 file
+# Optional: CERTIFICATE_PRIVATE_KEY = Base64 of RSA key (reuse Distribution cert across builds)
 
 workflows:
   ios-app-store:
@@ -26,7 +27,21 @@ workflows:
           head -n 1 /tmp/AuthKey.p8
       - name: Fetch or create signing files
         script: |
-          openssl genrsa -out /tmp/distribution.key 2048
+          set -e
+          if [ -n "${CERTIFICATE_PRIVATE_KEY:-}" ]; then
+            echo "$CERTIFICATE_PRIVATE_KEY" | base64 --decode > /tmp/distribution.key
+            if ! grep -qE "BEGIN|PRIVATE" /tmp/distribution.key 2>/dev/null; then
+              printf '%s\n' "$CERTIFICATE_PRIVATE_KEY" > /tmp/distribution.key
+            fi
+            echo "Using CERTIFICATE_PRIVATE_KEY from environment"
+          else
+            openssl genrsa -out /tmp/distribution.key 2048
+            echo "===== SAVE THIS as Codemagic secret CERTIFICATE_PRIVATE_KEY (Base64) ====="
+            base64 -i /tmp/distribution.key | tr -d '\n'
+            echo
+            echo "====="
+          fi
+
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create \
@@ -62,3 +77,4 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
+      - /tmp/distribution.key
