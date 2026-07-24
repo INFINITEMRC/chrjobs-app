@@ -1,6 +1,9 @@
 # Codemagic — ASC API key via group app_store_credentials
-# APP_STORE_CONNECT_PRIVATE_KEY = Base64 of the .p8 file
-# Optional: CERTIFICATE_PRIVATE_KEY = Base64 of RSA key (reuse Distribution cert across builds)
+# Required secrets in group app_store_credentials:
+#   APP_STORE_CONNECT_ISSUER_ID
+#   APP_STORE_CONNECT_KEY_IDENTIFIER
+#   APP_STORE_CONNECT_PRIVATE_KEY   (Base64 of AuthKey .p8)
+#   CERTIFICATE_PRIVATE_KEY        (Base64 of Distribution RSA key — from build log)
 
 workflows:
   ios-app-store:
@@ -28,27 +31,62 @@ workflows:
       - name: Fetch or create signing files
         script: |
           set -e
-          if [ -n "${CERTIFICATE_PRIVATE_KEY:-}" ]; then
-            echo "$CERTIFICATE_PRIVATE_KEY" | base64 --decode > /tmp/distribution.key
-            if ! grep -qE "BEGIN|PRIVATE" /tmp/distribution.key 2>/dev/null; then
-              printf '%s\n' "$CERTIFICATE_PRIVATE_KEY" > /tmp/distribution.key
-            fi
-            echo "Using CERTIFICATE_PRIVATE_KEY from environment"
-          else
-            openssl genrsa -out /tmp/distribution.key 2048
-            echo "===== SAVE THIS as Codemagic secret CERTIFICATE_PRIVATE_KEY (Base64) ====="
-            base64 -i /tmp/distribution.key | tr -d '\n'
-            echo
-            echo "====="
+          ASC=(
+            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID"
+            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER"
+            --private-key @file:/tmp/AuthKey.p8
+          )
+
+          if [ -z "${CERTIFICATE_PRIVATE_KEY:-}" ]; then
+            echo "ERROR: Add CERTIFICATE_PRIVATE_KEY (Base64) to Codemagic group app_store_credentials"
+            echo "Use the Base64 printed by the previous build under SAVE THIS as Codemagic secret"
+            exit 1
           fi
+
+          echo "$CERTIFICATE_PRIVATE_KEY" | base64 --decode > /tmp/distribution.key
+          if ! grep -qE "BEGIN|PRIVATE" /tmp/distribution.key 2>/dev/null; then
+            printf '%s\n' "$CERTIFICATE_PRIVATE_KEY" > /tmp/distribution.key
+          fi
+          echo "Using CERTIFICATE_PRIVATE_KEY"
+
+          # Delete orphan Distribution certs so we can create one for our private key
+          for TYPE in IOS_DISTRIBUTION DISTRIBUTION; do
+            echo "Listing certificates type=$TYPE"
+            app-store-connect certificates list \
+              "${ASC[@]}" \
+              --type "$TYPE" \
+              --json > "/tmp/certs_$TYPE.json" || true
+            python3 - <<PY
+          import json, subprocess, os, sys
+          path = "/tmp/certs_$TYPE.json"
+          try:
+              raw = open(path).read().strip()
+              if not raw:
+                  sys.exit(0)
+              data = json.loads(raw)
+          except Exception as e:
+              print("skip list parse:", e)
+              sys.exit(0)
+          items = data if isinstance(data, list) else data.get("data") or data.get("certificates") or []
+          for c in items:
+              cid = c.get("id") if isinstance(c, dict) else None
+              if not cid:
+                  continue
+              print("Deleting certificate", cid)
+              subprocess.run([
+                  "app-store-connect", "certificates", "delete", cid,
+                  "--issuer-id", os.environ["APP_STORE_CONNECT_ISSUER_ID"],
+                  "--key-id", os.environ["APP_STORE_CONNECT_KEY_IDENTIFIER"],
+                  "--private-key", "@file:/tmp/AuthKey.p8",
+              ], check=False)
+          PY
+          done
 
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create \
             --certificate-key=@file:/tmp/distribution.key \
-            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
-            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
-            --private-key @file:/tmp/AuthKey.p8
+            "${ASC[@]}"
           keychain add-certificates
       - name: Apply provisioning profiles to Xcode project
         script: |
@@ -77,4 +115,3 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-      - /tmp/distribution.key
