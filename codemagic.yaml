@@ -1,4 +1,4 @@
-# Codemagic — uses ASC API key from app Environment variables (no Teams UI needed)
+# Codemagic — ASC API key via group app_store_credentials
 
 workflows:
   ios-app-store:
@@ -25,7 +25,9 @@ workflows:
             --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
             --private-key "@env:APP_STORE_CONNECT_PRIVATE_KEY"
           keychain add-certificates
-          xcode-project use-profiles
+      - name: Apply provisioning profiles to Xcode project
+        script: |
+          xcode-project use-profiles --project "$XCODE_PROJECT"
       - name: Resolve Swift packages
         script: |
           xcodebuild -resolvePackageDependencies \
