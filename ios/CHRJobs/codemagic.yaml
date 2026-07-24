@@ -1,0 +1,42 @@
+# Codemagic CI/CD for CHR Jobs iOS (build from Windows workflow)
+# Docs: https://docs.codemagic.io/yaml/yaml-getting-started/
+
+workflows:
+  ios-app-store:
+    name: CHR Jobs iOS → App Store
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      ios_signing:
+        bundle_identifier: com.chrjobs.jobs
+        provisioning_profiles:
+          - name: CHR Jobs App Store
+        certificates:
+          - name: CHR Jobs Distribution
+      vars:
+        XCODE_WORKSPACE: "CHRJobs.xcodeproj"
+        XCODE_SCHEME: "CHRJobs"
+        APP_STORE_APP_ID: "" # fill after first app create if needed (numeric Apple ID)
+      xcode: latest
+    scripts:
+      - name: Install dependencies / resolve packages
+        script: |
+          cd "$CM_BUILD_DIR"
+          xcodebuild -resolvePackageDependencies \
+            -project "$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME"
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --project "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
