@@ -26,7 +26,6 @@ workflows:
           head -n 1 /tmp/AuthKey.p8
       - name: Fetch or create signing files
         script: |
-          # New keypair so Codemagic owns the Distribution certificate private key
           openssl genrsa -out /tmp/distribution.key 2048
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
@@ -49,13 +48,17 @@ workflows:
           xcode-project build-ipa \
             --project "$XCODE_PROJECT" \
             --scheme "$XCODE_SCHEME"
+      - name: Publish IPA to TestFlight
+        script: |
+          echo "$APP_STORE_CONNECT_PRIVATE_KEY" | base64 --decode > /tmp/AuthKey.p8
+          IPA_PATH="$(ls build/ios/ipa/*.ipa | head -n 1)"
+          echo "Publishing $IPA_PATH"
+          app-store-connect publish \
+            --path "$IPA_PATH" \
+            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
+            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+            --private-key @file:/tmp/AuthKey.p8 \
+            --testflight
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
-    publishing:
-      app_store_connect:
-        api_key: /tmp/AuthKey.p8
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        submit_to_testflight: true
-        submit_to_app_store: false
