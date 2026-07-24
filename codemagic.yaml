@@ -1,13 +1,10 @@
-# Codemagic config (repo root) — auto-creates App Store signing files via ASC API
+# Codemagic — uses ASC API key from app Environment variables (no Teams UI needed)
 
 workflows:
   ios-app-store:
     name: CHR Jobs iOS → App Store
     max_build_duration: 60
     instance_type: mac_mini_m2
-    integrations:
-      # Must match the name of your App Store Connect integration in Codemagic Teams
-      app_store_connect: codemagic
     environment:
       vars:
         XCODE_PROJECT: "ios/CHRJobs/CHRJobs.xcodeproj"
@@ -16,13 +13,15 @@ workflows:
       xcode: latest
     scripts:
       - name: Set up keychain
-        script: |
-          keychain initialize
+        script: keychain initialize
       - name: Fetch or create signing files
         script: |
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
-            --create
+            --create \
+            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID" \
+            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+            --private-key "@env:APP_STORE_CONNECT_PRIVATE_KEY"
           keychain add-certificates
           xcode-project use-profiles
       - name: Resolve Swift packages
@@ -40,6 +39,8 @@ workflows:
       - /tmp/xcodebuild_logs/*.log
     publishing:
       app_store_connect:
-        auth: integration
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
         submit_to_app_store: false
