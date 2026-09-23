@@ -27,7 +27,13 @@ workflows:
           if ! grep -q "BEGIN PRIVATE KEY" /tmp/AuthKey.p8 2>/dev/null; then
             printf '%s\n' "$APP_STORE_CONNECT_PRIVATE_KEY" > /tmp/AuthKey.p8
           fi
-          head -n 1 /tmp/AuthKey.p8
+          if grep -q "BEGIN PRIVATE KEY" /tmp/AuthKey.p8; then
+            echo "AuthKey.p8 looks valid"
+          else
+            echo "ERROR: AuthKey.p8 does not contain BEGIN PRIVATE KEY"
+            exit 1
+          fi
+          echo "Using App Store Connect key id: $APP_STORE_CONNECT_KEY_IDENTIFIER"
       - name: Fetch or create signing files
         script: |
           set -e
@@ -52,6 +58,9 @@ workflows:
             echo "CERTIFICATE_PRIVATE_KEY missing or invalid — generating a new Distribution key"
             openssl genrsa -out /tmp/distribution.key 2048
           fi
+
+          # Codemagic CLI auto-reads this env var as --certificate-key and fails if it is not PEM.
+          unset CERTIFICATE_PRIVATE_KEY
 
           # Delete orphan Distribution certs so we can create one for our private key
           for TYPE in IOS_DISTRIBUTION DISTRIBUTION; do
