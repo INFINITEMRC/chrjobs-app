@@ -37,17 +37,21 @@ workflows:
             --private-key @file:/tmp/AuthKey.p8
           )
 
-          if [ -z "${CERTIFICATE_PRIVATE_KEY:-}" ]; then
-            echo "ERROR: Add CERTIFICATE_PRIVATE_KEY (Base64) to Codemagic group app_store_credentials"
-            echo "Use the Base64 printed by the previous build under SAVE THIS as Codemagic secret"
-            exit 1
+          KEY_OK=0
+          if [ -n "${CERTIFICATE_PRIVATE_KEY:-}" ]; then
+            echo "$CERTIFICATE_PRIVATE_KEY" | base64 --decode > /tmp/distribution.key 2>/dev/null || true
+            if ! grep -qE "BEGIN.*PRIVATE KEY" /tmp/distribution.key 2>/dev/null; then
+              printf '%s\n' "$CERTIFICATE_PRIVATE_KEY" > /tmp/distribution.key
+            fi
+            if grep -qE "BEGIN.*PRIVATE KEY" /tmp/distribution.key 2>/dev/null; then
+              KEY_OK=1
+              echo "Using CERTIFICATE_PRIVATE_KEY"
+            fi
           fi
-
-          echo "$CERTIFICATE_PRIVATE_KEY" | base64 --decode > /tmp/distribution.key
-          if ! grep -qE "BEGIN|PRIVATE" /tmp/distribution.key 2>/dev/null; then
-            printf '%s\n' "$CERTIFICATE_PRIVATE_KEY" > /tmp/distribution.key
+          if [ "$KEY_OK" != "1" ]; then
+            echo "CERTIFICATE_PRIVATE_KEY missing or invalid — generating a new Distribution key"
+            openssl genrsa -out /tmp/distribution.key 2048
           fi
-          echo "Using CERTIFICATE_PRIVATE_KEY"
 
           # Delete orphan Distribution certs so we can create one for our private key
           for TYPE in IOS_DISTRIBUTION DISTRIBUTION; do
