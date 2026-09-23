@@ -14,6 +14,8 @@
 		A10000000000000000000005 /* AdConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* AdConfig.swift */; };
 		A10000000000000000000006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* Assets.xcassets */; };
 		A10000000000000000000007 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = A50000000000000000000001 /* GoogleMobileAds */; };
+		A10000000000000000000008 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* AppDelegate.swift */; };
+		A10000000000000000000009 /* ExceptionCatcher.m in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000A /* ExceptionCatcher.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,10 @@
 		A20000000000000000000006 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A20000000000000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A20000000000000000000008 /* CHRJobs.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHRJobs.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000009 /* ExceptionCatcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExceptionCatcher.h; sourceTree = "<group>"; };
+		A2000000000000000000000A /* ExceptionCatcher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExceptionCatcher.m; sourceTree = "<group>"; };
+		A2000000000000000000000B /* CHRJobs-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "CHRJobs-Bridging-Header.h"; sourceTree = "<group>"; };
+		A2000000000000000000000C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +57,10 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000001 /* CHRJobsApp.swift */,
+				A2000000000000000000000C /* AppDelegate.swift */,
+				A20000000000000000000009 /* ExceptionCatcher.h */,
+				A2000000000000000000000A /* ExceptionCatcher.m */,
+				A2000000000000000000000B /* CHRJobs-Bridging-Header.h */,
 				A20000000000000000000002 /* ContentView.swift */,
 				A20000000000000000000003 /* WebViewContainer.swift */,
 				A20000000000000000000004 /* AdManager.swift */,
@@ -147,6 +157,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000001 /* CHRJobsApp.swift in Sources */,
+				A10000000000000000000008 /* AppDelegate.swift in Sources */,
+				A10000000000000000000009 /* ExceptionCatcher.m in Sources */,
 				A10000000000000000000002 /* ContentView.swift in Sources */,
 				A10000000000000000000003 /* WebViewContainer.swift in Sources */,
 				A10000000000000000000004 /* AdManager.swift in Sources */,
@@ -202,17 +214,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 2DS65D6QYY;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = CHRJobs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CHR Jobs";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "CHRJobs/CHRJobs-Bridging-Header.h";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chrjobs.jobs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -229,17 +242,18 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_TEAM = 2DS65D6QYY;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = CHRJobs/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CHR Jobs";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "CHRJobs/CHRJobs-Bridging-Header.h";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chrjobs.jobs;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

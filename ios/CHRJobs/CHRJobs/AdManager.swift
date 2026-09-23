@@ -11,13 +11,25 @@ final class AdManager: NSObject, ObservableObject {
     private var pageLoadCount = 0
 
     func loadBanner() {
-        let width = UIScreen.main.bounds.width
+        let width = bannerWidth()
+        guard width >= 32 else { return }
+
         let adSize = currentOrientationAnchoredAdaptiveBanner(width: width)
         let banner = BannerView(adSize: adSize)
         banner.adUnitID = AdConfig.bannerUnitID
         banner.rootViewController = topViewController()
         banner.load(Request())
         bannerView = banner
+    }
+
+    private func bannerWidth() -> CGFloat {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        if let scene = scenes.first {
+            let windowWidth = scene.windows.first(where: \.isKeyWindow)?.bounds.width
+                ?? scene.coordinateSpace.bounds.width
+            if windowWidth >= 32 { return windowWidth }
+        }
+        return UIScreen.main.bounds.width
     }
 
     func loadInterstitial() {

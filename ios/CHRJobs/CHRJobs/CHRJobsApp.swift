@@ -1,14 +1,10 @@
 import SwiftUI
-import GoogleMobileAds
 import AppTrackingTransparency
 
 @main
 struct CHRJobsApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var adManager = AdManager()
-
-    init() {
-        MobileAds.shared.start()
-    }
 
     var body: some Scene {
         WindowGroup {
@@ -16,15 +12,17 @@ struct CHRJobsApp: App {
                 .environmentObject(adManager)
                 .onAppear {
                     requestTrackingIfNeeded()
-                    adManager.loadBanner()
-                    adManager.loadInterstitial()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        adManager.loadBanner()
+                        adManager.loadInterstitial()
+                    }
                 }
         }
     }
 
     private func requestTrackingIfNeeded() {
         guard #available(iOS 14, *) else { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             ATTrackingManager.requestTrackingAuthorization { _ in }
         }
     }
