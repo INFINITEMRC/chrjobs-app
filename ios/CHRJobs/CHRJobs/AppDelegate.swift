@@ -8,12 +8,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     ) -> Bool {
         // Never start ads in SwiftUI App.init() — that can abort on iPad before a window exists.
         DispatchQueue.main.async {
-            var startError: NSError?
-            let started = ExceptionCatcher.run({
+            if let reason = ExceptionCatcher.runBlock({
                 MobileAds.shared.start()
-            }, error: &startError)
-            if !started {
-                print("AdMob start skipped: \(startError?.localizedDescription ?? "unknown")")
+            }) {
+                print("AdMob start skipped: \(reason)")
             }
         }
         return true

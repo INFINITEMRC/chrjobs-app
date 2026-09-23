@@ -2,19 +2,12 @@
 
 @implementation ExceptionCatcher
 
-+ (BOOL)run:(void (^)(void))block error:(NSError **)error {
++ (NSString *)runBlock:(void (^)(void))block {
     @try {
         block();
-        return YES;
+        return nil;
     } @catch (NSException *exception) {
-        if (error != NULL) {
-            *error = [NSError errorWithDomain:@"CHRJobs"
-                                         code:1
-                                     userInfo:@{
-                NSLocalizedDescriptionKey: exception.reason ?: @"Uncaught exception"
-            }];
-        }
-        return NO;
+        return exception.reason ?: @"Uncaught exception";
     }
 }
 
