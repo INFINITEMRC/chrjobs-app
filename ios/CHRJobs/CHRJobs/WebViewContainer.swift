@@ -18,6 +18,9 @@ struct WebViewContainer: UIViewRepresentable {
 
         let preferences = WKWebpagePreferences()
         preferences.allowsContentJavaScript = true
+        if #available(iOS 14.0, *) {
+            preferences.preferredContentMode = .mobile
+        }
         config.defaultWebpagePreferences = preferences
 
         let webView = WKWebView(frame: .zero, configuration: config)
