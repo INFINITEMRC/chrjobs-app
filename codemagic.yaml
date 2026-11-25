@@ -109,6 +109,38 @@ workflows:
           xcodebuild -resolvePackageDependencies \
             -project "$XCODE_PROJECT" \
             -scheme "$XCODE_SCHEME"
+      - name: Set build number from TestFlight
+        script: |
+          set -e
+          ASC=(
+            --issuer-id "$APP_STORE_CONNECT_ISSUER_ID"
+            --key-id "$APP_STORE_CONNECT_KEY_IDENTIFIER"
+            --private-key @file:/tmp/AuthKey.p8
+          )
+          APP_JSON=$(app-store-connect apps list \
+            --bundle-id-identifier "$BUNDLE_ID" \
+            --strict-match-identifier \
+            --json \
+            "${ASC[@]}")
+          APP_APPLE_ID=$(printf '%s' "$APP_JSON" | python3 -c 'import json,sys; raw=json.load(sys.stdin); apps=raw if isinstance(raw, list) else next((raw[k] for k in ("data","apps","results") if isinstance(raw.get(k), list)), [raw] if isinstance(raw, dict) and "id" in raw else []); print((apps[0].get("id") if apps else "") or "")')
+          if [ -z "$APP_APPLE_ID" ]; then
+            echo "Could not resolve the App Store Connect Apple ID for $BUNDLE_ID"
+            exit 1
+          fi
+          echo "App Store Connect Apple ID: $APP_APPLE_ID"
+          app-store-connect get-latest-testflight-build-number "$APP_APPLE_ID" \
+            --platform IOS \
+            "${ASC[@]}" > /tmp/latest-testflight-build.txt
+          LATEST_BUILD_NUMBER=$(grep -E '^[[:space:]]*[0-9]+[[:space:]]*$' /tmp/latest-testflight-build.txt | tail -n 1 | tr -d '[:space:]')
+          if ! printf '%s' "$LATEST_BUILD_NUMBER" | grep -Eq '^[0-9]+$'; then
+            echo "Could not parse the latest TestFlight build number"
+            cat /tmp/latest-testflight-build.txt
+            exit 1
+          fi
+          NEXT_BUILD_NUMBER=$((LATEST_BUILD_NUMBER + 1))
+          echo "Latest TestFlight build is $LATEST_BUILD_NUMBER. Setting CFBundleVersion to $NEXT_BUILD_NUMBER."
+          cd ios/CHRJobs
+          agvtool new-version -all "$NEXT_BUILD_NUMBER"
       - name: Build IPA
         script: |
           xcode-project build-ipa \
